@@ -63,13 +63,26 @@ class YtdlCommand(commands.Cog):
                     info = ydl.extract_info(link, download=False)
                     if 'is_live' in info and info['is_live']:
                         raise yt_dl.DownloadError('Cannot download a livestream')
+                    if 'filesize' in info:
+                        if info['filesize'] > 100000000:
+                            await inter.delete_original_message()
+                            raise yt_dl.DownloadError(f'File is too large! ({utils.bytes2human(info["filesize"])})')
+                    elif 'filesize_approx' in info:
+                        if info['filesize_approx'] > 100000000:
+                            await inter.delete_original_message()
+                            raise yt_dl.DownloadError(f'File is too large! ({utils.bytes2human(info["filesize_approx"])})')
+                    else:
+                        await inter.edit_original_message('Could not calculate estimate of file size. Video could not be downloaded.')
+                        await inter.delete_original_message(delay=20)
+                        return
+
                     ydl.download(link)
 
                 fp = tmpdir + '/' + info['id'] + '.' + info['ext']
                 size = os.path.getsize(fp)
                 webhook = None
                 if size > 8000000:
-                    if size > 50000000:
+                    if size > 105000000:
                         raise yt_dl.DownloadError(f'File is too large! ({utils.bytes2human(size)})')
 
                     view = CompressQuestion()
@@ -82,7 +95,7 @@ class YtdlCommand(commands.Cog):
                         return
                     elif view.response == 'compress':
                         await webhook.edit('Compressing video...', view=view)
-                        fp = await self.eight_mb(tmpdir, fp)
+                        fp = await utils.eight_mb(tmpdir, fp)
                     else:
                         await webhook.edit('Cancelled.', view=view)
                         await inter.delete_original_message()
