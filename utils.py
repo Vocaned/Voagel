@@ -1,7 +1,6 @@
-import aiohttp
 import typing
 import urllib
-import disnake
+import aiohttp
 
 class RestOptions:
     def __init__(self, method='GET', headers=None, data=None, auth=None, returns: typing.Union[str, typing.Tuple[str]] = 'json') -> None:

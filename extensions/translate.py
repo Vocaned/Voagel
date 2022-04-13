@@ -1,7 +1,7 @@
+from typing import List
 import disnake
 from disnake.ext import commands
 from pycountry import languages
-from typing import List
 import lynn
 import utils
 
