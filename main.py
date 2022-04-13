@@ -1,7 +1,6 @@
 import glob
 import logging
 import disnake
-from disnake.ext import commands
 import lynn
 
 bot = lynn.Bot()
@@ -11,7 +10,14 @@ async def on_ready():
     logging.info("Bot is ready.")
 
 if __name__ == '__main__':
-    logging.basicConfig(encoding='utf-8', level=logging.INFO)
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(lynn.ColorFormatter())
+
+    logger.addHandler(ch)
 
     for extension in [f.replace('.py', '').replace('/', '.').replace('\\', '.') for f in glob.glob('extensions/**/*.py', recursive=True)]:
         try:

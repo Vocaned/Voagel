@@ -1,38 +1,30 @@
-import disnake
-from disnake.ext import commands
 import logging
 import traceback
+import disnake
+from disnake.ext import commands
 import lynn
 
 class Errors(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # TODO: REWRITE THIS SHIT
     @commands.Cog.listener()
     async def on_slash_command_error(self,
         inter: disnake.ApplicationCommandInteraction,
         error: commands.CommandError
     ):
-        error = getattr(error, 'original', error)
-
         if isinstance(error, commands.CommandNotFound):
             return
 
-        logging.error('Ignoring exception in %s', inter.application_command.name)
+        logging.warning('Ignoring exception in /%s', inter.application_command.name)
         try:
             with open('data/error.dat', 'w', encoding='utf-8') as f:
                 f.write('\n'.join(traceback.format_exception(type(error), error, error.__traceback__)))
         except:
             logging.error('ERROR: Could not write error to error.dat')
 
-        errmsg = ''
-
-        try:
-            if hasattr(error, 'args'):
-                errmsg = f"Error: `{type(error).__name__}: {error}`\n"
-        except:
-            pass
+        errtype = None
+        errmsg = None
 
         if isinstance(error, commands.BotMissingPermissions):
             missing = [perm.replace('_', ' ').title() for perm in error.missing_perms]
@@ -40,63 +32,46 @@ class Errors(commands.Cog):
                 fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
             else:
                 fmt = ' and '.join(missing)
-            _message = 'I need the **{}** permission(s) to run this command.'.format(fmt)
-            errmsg += _message
-            return
-
-        if isinstance(error, commands.NSFWChannelRequired):
-            errmsg += 'This command can only be used in NSFW channels.'
-            return
-
-        if isinstance(error, commands.DisabledCommand):
-            errmsg += 'This command has been disabled in this server.'
-            return
-
-        if isinstance(error, commands.CommandOnCooldown):
-            errmsg += f'This command is on cooldown, please retry in {round(error.retry_after)}s'
-            return
-
-        if isinstance(error, commands.MissingPermissions):
+            _message = 'The bot is missing the **{}** permission(s) to run this command.'.format(fmt)
+            errtype = 'Not enough permissions.'
+            errmsg = _message
+        elif isinstance(error, commands.NSFWChannelRequired):
+            errtype = 'This command can only be used in NSFW channels.'
+        elif isinstance(error, commands.DisabledCommand):
+            errtype = 'This command has been disabled in this server.'
+        elif isinstance(error, commands.CommandOnCooldown):
+            errtype = 'This command is on cooldown'
+            errmsg = f'Please try again in {round(error.retry_after)}s'
+        elif isinstance(error, commands.MissingPermissions):
             missing = [perm.replace('_', ' ').title() for perm in error.missing_perms]
             if len(missing) > 2:
                 fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
             else:
                 fmt = ' and '.join(missing)
-            errmsg += 'You need the **{}** permission(s) to use this command.'.format(fmt)
-            return
+            errtype = 'Not enough permissions.'
+            errmsg = 'You need the **{}** permission(s) to use this command.'.format(fmt)
+        elif isinstance(error, commands.UserInputError):
+            errtype = 'Invalid input. Check /help page for command.'
+        elif isinstance(error, commands.NoPrivateMessage):
+            errtype = 'This command cannot be used in direct messages.'
+        elif isinstance(error, commands.CheckFailure):
+            errtype = 'You do not have permission to use this command.'
+        elif isinstance(error, commands.ExtensionAlreadyLoaded):
+            errtype = 'Extension already loaded.'
+        elif isinstance(error, commands.ExtensionNotFound):
+            errtype = 'Extension not found.'
+        elif isinstance(error, commands.ExtensionNotLoaded):
+            errtype = 'Extension not loaded.'
+        elif isinstance(error, commands.ExtensionFailed):
+            errtype = 'Failed to load extension.'
+        elif isinstance(error, commands.CommandError):
+            errtype = f'Uncaught exception occured in `{inter.application_command.name}`'
 
-        if isinstance(error, commands.UserInputError):
-            await inter.send('Invalid input. Check /help page for command.')
-            return
+            original = getattr(error, 'original', error)
+            errmsg = f'{type(original).__name__}: {original}'
 
-        if isinstance(error, commands.NoPrivateMessage):
-            try:
-                await inter.send('This command cannot be used in direct messages.')
-            except disnake.Forbidden:
-                pass
-            return
-
-        if isinstance(error, commands.CheckFailure):
-            errmsg += 'You do not have permission to use this command.'
-            return
-
-        if isinstance(error, commands.ExtensionAlreadyLoaded):
-            errmsg += 'Extension already loaded.'
-            return
-
-        if isinstance(error, commands.ExtensionNotFound):
-            errmsg += 'Extension not found.'
-            return
-
-        if isinstance(error, commands.ExtensionNotLoaded):
-            errmsg += 'Extension not loaded.'
-            return
-
-        if isinstance(error, commands.ExtensionFailed):
-            errmsg += 'Failed to load extension.'
-            return
-
-        await inter.send(errmsg)
+        embed = disnake.Embed(color=lynn.ERROR_COLOR, title=errtype, description=errmsg)
+        await inter.send(embed=embed, ephemeral=True)
 
 def setup(bot: lynn.Bot):
     bot.add_cog(Errors(bot))
