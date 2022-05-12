@@ -9,6 +9,20 @@ class Errors(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
+    async def on_message_command_error(self,
+        inter: disnake.ApplicationCommandInteraction,
+        error: commands.CommandError
+    ):
+        return await self.on_slash_command_error(inter, error)
+
+    @commands.Cog.listener()
+    async def on_user_command_error(self,
+        inter: disnake.ApplicationCommandInteraction,
+        error: commands.CommandError
+    ):
+        return await self.on_slash_command_error(inter, error)
+
+    @commands.Cog.listener()
     async def on_slash_command_error(self,
         inter: disnake.ApplicationCommandInteraction,
         error: commands.CommandError
@@ -29,10 +43,10 @@ class Errors(commands.Cog):
         if isinstance(error, commands.BotMissingPermissions):
             missing = [perm.replace('_', ' ').title() for perm in error.missing_perms]
             if len(missing) > 2:
-                fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+                fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
             else:
                 fmt = ' and '.join(missing)
-            _message = 'The bot is missing the **{}** permission(s) to run this command.'.format(fmt)
+            _message = f'The bot is missing the **{fmt}** permission(s) to run this command.'
             errtype = 'Not enough permissions.'
             errmsg = _message
         elif isinstance(error, commands.NSFWChannelRequired):
@@ -45,11 +59,11 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.MissingPermissions):
             missing = [perm.replace('_', ' ').title() for perm in error.missing_perms]
             if len(missing) > 2:
-                fmt = '{}, and {}'.format("**, **".join(missing[:-1]), missing[-1])
+                fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
             else:
                 fmt = ' and '.join(missing)
             errtype = 'Not enough permissions.'
-            errmsg = 'You need the **{}** permission(s) to use this command.'.format(fmt)
+            errmsg = f'You need the **{fmt}** permission(s) to use this command.'
         elif isinstance(error, commands.UserInputError):
             errtype = 'Invalid input. Check /help page for command.'
         elif isinstance(error, commands.NoPrivateMessage):
@@ -64,7 +78,7 @@ class Errors(commands.Cog):
             errtype = 'Extension not loaded.'
         elif isinstance(error, commands.ExtensionFailed):
             errtype = 'Failed to load extension.'
-        elif isinstance(error, commands.CommandError):
+        elif isinstance(error, commands.CommandInvokeError):
             errtype = f'Uncaught exception occured in `{inter.application_command.name}`'
 
             original = getattr(error, 'original', error)

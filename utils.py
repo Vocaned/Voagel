@@ -4,24 +4,21 @@ import aiohttp
 import asyncio
 import os
 import logging
+import html.parser
 
-class RestOptions:
-    def __init__(self, method='GET', headers=None, data=None, auth=None, returns: typing.Union[str, typing.Tuple[str]] = 'json') -> None:
-        self.method = method
-        self.headers = headers
-        self.data = data
-        self.auth = auth
-        self.returns = returns
-
-async def rest(url: str, opts: RestOptions = RestOptions()) -> typing.Union[object, typing.List[object]]:
+async def rest(url: str, method='GET', headers=None, data=None, auth=None, returns: typing.Union[str, typing.Tuple[str]] = 'json') -> typing.Union[object, typing.List[object]]:
     async with aiohttp.ClientSession() as s:
-        async with s.request(opts.method, url, headers=opts.headers, data=opts.data, auth=opts.auth) as r:
+        if not headers:
+            headers = {}
+        if 'User-Agent' not in headers:
+            headers['User-Agent'] = 'Lynn5 (Discord Bot) https://github.com/Fam0r/Lynn5'
+        async with s.request(method, url, headers=headers, data=data, auth=auth) as r:
             temp = []
 
-            if isinstance(opts.returns, str):
-                opts.returns = (opts.returns, )
+            if isinstance(returns, str):
+                returns = (returns, )
 
-            for out in opts.returns:
+            for out in returns:
                 if out == 'json':
                     try:
                         j = await r.json()
@@ -51,6 +48,7 @@ def escape_url(url: str) -> str:
 
 async def eight_mb(tmpdir: str, fp: str) -> str:
     size = os.path.getsize(fp)
+    origsize = size
 
     maxsize = 8388119
     audio_bitrate=128000
@@ -64,7 +62,7 @@ async def eight_mb(tmpdir: str, fp: str) -> str:
         target_video_bitrate = (target_total_bitrate - audio_bitrate) * tolerance
         assert target_video_bitrate > 0
         logging.info("trying to force %s (%s) under %s with tolerance %s. trying %s/s",
-        fp, bytes2human(size), bytes2human(maxsize), tolerance, bytes2human(target_video_bitrate / 8))
+        fp, bytes2human(origsize), bytes2human(maxsize), tolerance, bytes2human(target_video_bitrate / 8))
         pass1log = tmpdir + "/pass1.log"
         outfile = tmpdir + "/out.mp4"
         await check_output(['ffmpeg', '-y', '-i', fp, '-c:v', 'h264', '-b:v', str(target_video_bitrate), '-pass', '1',
@@ -76,6 +74,10 @@ async def eight_mb(tmpdir: str, fp: str) -> str:
             logging.info("successfully created %s video!", bytes2human(size))
             return outfile
         logging.info("tolerance %s failed. output is %s", tolerance, bytes2human(size))
+        if os.path.exists(pass1log):
+            os.remove(pass1log)
+        if os.path.exists(outfile):
+            os.remove(outfile)
     raise Exception(f"Unable to fit {fp} within {bytes2human(maxsize)}")
 
 def bytes2human(n: int) -> str:
@@ -98,7 +100,7 @@ async def subprocess(*args, **kwargs):
         proc.terminate()
         raise
 
-async def check_output(args: typing.List[str], timeout: int = 30, raise_on_error: bool = False):
+async def check_output(args: typing.List[str], timeout: int = 120, raise_on_error: bool = False):
     proc = await asyncio.wait_for(subprocess(args[0], *args[1:], stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT), timeout)
     out = await proc.stdout.read()
     out = out.decode('utf-8')
@@ -106,3 +108,20 @@ async def check_output(args: typing.List[str], timeout: int = 30, raise_on_error
     if raise_on_error and proc.returncode != 0:
         raise Exception(f'Shell process for `{args[0]}` exited with status `{proc.returncode}`')
     return out
+
+class OpenGraphParser(html.parser.HTMLParser):
+    def __init__(self, *, convert_charrefs: bool = ...) -> None:
+        super().__init__(convert_charrefs=convert_charrefs)
+        self.tags = {}
+
+    def handle_starttag(self, tag, attrs):
+        if tag != 'meta':
+            return
+        k = v = None
+        for attr in attrs:
+            if attr[0].lower() == 'name' or attr[0].lower() == 'property' and attr[1].startswith('og:'):
+                k = attr[1]
+            if attr[0].lower() == 'content':
+                v = attr[1]
+        if k and v:
+            self.tags[k] = v

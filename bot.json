@@ -1,6 +1,8 @@
 {
     "secrets": {
-        "discord": "DISCORD TOKEN HERE"
+        "discord": "DISCORD TOKEN HERE",
+        "ocrspace": "",
+        "wolframalpha": ""
     },
     "status": "online",
     "activity": null
