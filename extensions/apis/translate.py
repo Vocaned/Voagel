@@ -1,9 +1,11 @@
 from typing import List
+
 import disnake
-from disnake.ext import commands
-from pycountry import languages
 import lynn
 import utils
+from disnake.ext import commands
+from pycountry import languages
+
 
 async def autocomplete_langs(inter, string: str) -> List[str]:
     langs = []

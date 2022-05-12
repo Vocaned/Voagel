@@ -1,8 +1,10 @@
+import re
+
 import disnake
-from disnake.ext import commands
 import lynn
 import utils
-import re
+from disnake.ext import commands
+
 
 class OCRCommand(commands.Cog):
     """OCR"""
