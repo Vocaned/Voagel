@@ -74,7 +74,7 @@ class OCRCommand(commands.Cog):
         else:
             await inter.send(f"```{res['ParsedResults'][0]['ParsedText']} ```")
 
-    @commands.slash_command(name='OCR', guild_ids=[702953546106273852])
+    @commands.slash_command(name='ocr', guild_ids=[702953546106273852])
     async def ocr_v2(self,
         inter: disnake.ApplicationCommandInteraction,
         link: str, # TODO: Make optional once image uploading on slash commands becomes available
@@ -100,7 +100,7 @@ class OCRCommand(commands.Cog):
         else:
             await inter.send(f"```{res['ParsedResults'][0]['ParsedText']} ```")
 
-    @commands.slash_command(name='OCRV3', guild_ids=[702953546106273852])
+    @commands.slash_command(name='ocrv3', guild_ids=[702953546106273852])
     async def ocr_v3(self,
         inter: disnake.ApplicationCommandInteraction,
         link: str, # TODO: Make optional once image uploading on slash commands becomes available

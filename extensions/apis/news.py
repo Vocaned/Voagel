@@ -67,7 +67,7 @@ class NewsCommand(commands.Cog):
                 self.page += 1
                 await inter.response.edit_message(embed=await self.get_embed())
 
-    @commands.slash_command(name='News', guild_ids=[702953546106273852])
+    @commands.slash_command(guild_ids=[702953546106273852])
     async def news(self,
         inter: disnake.ApplicationCommandInteraction,
         query: str = None

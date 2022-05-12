@@ -36,9 +36,9 @@ class YtdlCommand(commands.Cog):
     def __init__(self, bot: lynn.Bot):
         self.bot = bot
 
-    @commands.slash_command(name='DL', guild_ids=[702953546106273852])
+    @commands.slash_command(name='dl', guild_ids=[702953546106273852])
     async def ytdl(self,
-        inter: disnake.GuildCommandInteraction,
+        inter: disnake.ApplicationCommandInteraction,
         link: str
     ):
         """Download any video on the internet
