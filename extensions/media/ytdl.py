@@ -27,6 +27,7 @@ class CompressQuestion(disnake.ui.View):
         self.response = 'compress'
         self.stop()
 
+    # Upload to website (12h temp file)
 
 
 class YtdlCommand(commands.Cog):
@@ -35,8 +36,8 @@ class YtdlCommand(commands.Cog):
     def __init__(self, bot: lynn.Bot):
         self.bot = bot
 
-    @commands.slash_command(guild_ids=[702953546106273852])
-    async def dl(self,
+    @commands.slash_command(name='DL', guild_ids=[702953546106273852])
+    async def ytdl(self,
         inter: disnake.GuildCommandInteraction,
         link: str
     ):

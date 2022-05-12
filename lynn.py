@@ -33,6 +33,12 @@ class Bot(commands.Bot):
 
         super().__init__()
 
+    def get_api_key(self, key: str) -> str:
+        val = self.config['secrets'].get(key, None)
+        if not val:
+            raise commands.DisabledCommand('API key for command missing. Ping the bot owner for help.')
+        return val
+
     def load_config(self):
         if not os.path.exists('config'):
             os.mkdir('config')
