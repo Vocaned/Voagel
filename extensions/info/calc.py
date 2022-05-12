@@ -322,7 +322,7 @@ class CalculatorCommand(commands.Cog):
 
     @commands.slash_command(guild_ids=[702953546106273852])
     async def calculator(self,
-        inter: disnake.GuildCommandInteraction,
+        inter: disnake.ApplicationCommandInteraction,
         expression: str
     ):
         """Math

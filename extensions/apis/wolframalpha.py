@@ -12,7 +12,7 @@ class WolframAlphaCommand(commands.Cog):
     def __init__(self, bot: lynn.Bot):
         self.bot = bot
 
-    @commands.slash_command(name='WolframAlpha', guild_ids=[702953546106273852])
+    @commands.slash_command(guild_ids=[702953546106273852])
     async def wolframalpha(self,
         inter: disnake.ApplicationCommandInteraction,
         query: str

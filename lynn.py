@@ -26,7 +26,7 @@ class ColorFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-class Bot(commands.Bot):
+class Bot(commands.InteractionBot):
     def __init__(self):
         self.config = {}
         self.data = {}

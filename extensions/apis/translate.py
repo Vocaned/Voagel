@@ -57,7 +57,7 @@ class TranslateCommand(commands.Cog):
         embed.add_field('To `English`', data[0][0][0], inline=False)
         await inter.send(embed=embed)
 
-    @commands.slash_command(name='Translate', guild_ids=[702953546106273852])
+    @commands.slash_command(guild_ids=[702953546106273852])
     async def translate(self,
         inter: disnake.ApplicationCommandInteraction,
         query: str,
