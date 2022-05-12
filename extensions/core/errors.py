@@ -1,8 +1,10 @@
 import logging
 import traceback
+
 import disnake
-from disnake.ext import commands
 import lynn
+from disnake.ext import commands
+
 
 class Errors(commands.Cog):
     def __init__(self, bot):

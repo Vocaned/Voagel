@@ -1,8 +1,10 @@
-import disnake
-from disnake.ext import commands
 from io import BytesIO
+
+import disnake
 import lynn
 import utils
+from disnake.ext import commands
+
 
 class WolframAlphaCommand(commands.Cog):
     """Wolfram Alpha"""

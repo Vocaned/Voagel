@@ -1,9 +1,10 @@
-import re
-import operator
 import math
+import operator
+import re
+
 import disnake
-from disnake.ext import commands
 import lynn
+from disnake.ext import commands
 
 """calclib - Stuff used by calc"""
 

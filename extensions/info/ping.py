@@ -1,6 +1,7 @@
 import disnake
-from disnake.ext import commands
 import lynn
+from disnake.ext import commands
+
 
 class PingCommand(commands.Cog):
     """Ping command."""

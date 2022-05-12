@@ -1,11 +1,11 @@
-import tempfile
+import logging
 import os
-from disnake.ext import commands
+import tempfile
+
 import disnake
 import lynn
 import utils
-import logging
-
+from disnake.ext import commands
 
 try:
     import yt_dlp as yt_dl
@@ -104,7 +104,7 @@ class YtdlCommand(commands.Cog):
 
                 file = disnake.File(fp, filename=info['id'] + '.' + info['ext'], description='Source: ' + link)
                 await inter.edit_original_message(content='', file=file)
-                if webhook != None:
+                if webhook is not None:
                     await webhook.edit('Compressed.')
             except FileNotFoundError as e:
                 raise yt_dl.DownloadError('Could not download video.') from e

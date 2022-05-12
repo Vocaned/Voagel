@@ -1,9 +1,11 @@
-import disnake
-from disnake.ext import commands
-import lynn
 import re
 
-def converter(_, argument: str) -> disnake.Object:
+import disnake
+import lynn
+from disnake.ext import commands
+
+
+def converter(argument: str) -> disnake.Object:
     match = re.match(r"([0-9]{15,20})$", argument) or re.match(
         r"<(?:@(?:!|&)?|#)([0-9]{15,20})>$", argument
     )
@@ -24,16 +26,23 @@ class SnowflakeCommand(commands.Cog):
     @commands.slash_command(name='Snowflake', guild_ids=[702953546106273852])
     async def snowflake(self,
         inter: disnake.GuildCommandInteraction,
-        snowflake: disnake.Object = commands.Param(description='Snowflake ID or Discord object', converter=converter)
+        snowflake: str
     ):
         """
         Get information from any snowflake or discord object
+
+        Parameters
+        ----------
+        snowflake: Snowflake ID or Discord object
         """
-        embed = disnake.Embed(title=snowflake.id, color=lynn.EMBED_COLOR)
+
+        embed = disnake.Embed(description=snowflake, color=lynn.EMBED_COLOR)
+        snowflake = converter(snowflake)
         embed.add_field('Timestamp', snowflake.created_at.strftime('%c'), inline=False)
         embed.add_field('Internal Worker ID', (snowflake.id & 0x3E0000) >> 17, inline=False)
         embed.add_field('Internal Process ID', (snowflake.id & 0x1F000) >> 12, inline=False)
         embed.add_field('Increment', snowflake.id & 0xFFF, inline=False)
+        embed.set_footer(text=snowflake.id)
         await inter.send(embed=embed)
 
 def setup(bot: lynn.Bot):
