@@ -18,6 +18,56 @@ class MinecraftCommands(commands.Cog):
     def __init__(self, bot: lynn.Bot):
         self.bot = bot
 
+    LEGACY_COLOR_MAP = {
+        '0': '\033[30m',
+        '1': '\033[34m',
+        '2': '\033[32m',
+        '3': '\033[36m',
+        '4': '\033[31m',
+        '5': '\033[35m',
+        '6': '\033[33m',
+        '7': '\033[0m',
+        '8': '\033[0m',
+        '9': '\033[34m',
+        'a': '\033[32m',
+        'b': '\033[36m',
+        'c': '\033[31m',
+        'd': '\033[35m',
+        'e': '\033[33m',
+        'f': '\033[37m',
+        'k': '\033[9m',
+        'l': '\033[1m',
+        'm': '\033[9m',
+        'n': '\033[4m',
+        'o': '\033[3m',
+        'r': '\033[0m',
+    }
+
+    COLOR_MAP = {
+        'black': '\033[30m',
+        'dark_blue': '\033[34m',
+        'dark_green': '\033[32m',
+        'dark_aqua': '\033[36m',
+        'dark_red': '\033[31m',
+        'dark_purple': '\033[35m',
+        'gold': '\033[33m',
+        'gray': '\033[0m',
+        'dark_gray': '\033[0m',
+        'blue': '\033[34m',
+        'green': '\033[32m',
+        'aqua': '\033[36m',
+        'red': '\033[31m',
+        'light_purple': '\033[35m',
+        'yellow': '\033[33m',
+        'white': '\033[37m',
+        'obfuscated': '\033[9m',
+        'bold': '\033[1m',
+        'strikethrough': '\033[9m',
+        'underline': '\033[4m',
+        'italic': '\033[3m',
+        'reset': '\033[0m',
+    }
+
     async def get_UUID(self, name: str) -> str:
         status, text = await utils.rest(f'https://api.mojang.com/users/profiles/minecraft/{name}', returns=('status', 'text'))
         if status == 200:
@@ -202,7 +252,6 @@ class MinecraftCommands(commands.Cog):
                 raise Exception('Could not connect to server. Make sure the IP is valid.')
             raise e
 
-    # TODO: Finish this
     @minecraft.sub_command()
     async def server(self,
         inter: disnake.ApplicationCommandInteraction,
@@ -232,6 +281,7 @@ class MinecraftCommands(commands.Cog):
         else:
             embed.set_thumbnail(url='https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/78/Pack_64x64.png')
 
+        print(data['description'])
         if isinstance(data['description'], dict):
             # json text format
             desc = data['description']
@@ -239,18 +289,43 @@ class MinecraftCommands(commands.Cog):
             for obj in desc:
                 if obj == 'extra':
                     for extra in desc[obj]:
+                        if 'color' in extra:
+                            description += self.COLOR_MAP.get(extra['color'], '')
+                        if 'bold' in extra:
+                            description += self.COLOR_MAP['bold']
+                        if 'italic' in extra:
+                            description += self.COLOR_MAP['italic']
+                        if 'strikethrough' in extra:
+                            description += self.COLOR_MAP['strikethrough']
+                        if 'underline' in extra:
+                            description += self.COLOR_MAP['underline']
                         if 'text' in extra:
                             description += extra['text']
+
+                        description += self.COLOR_MAP['reset']
                 elif obj == 'text':
                     description += desc[obj]
+
+            lines = []
+            for line in description.split('\n'):
+                lines.append(line.strip())
+            description = '\n'.join(lines)
         else:
             description = ''
+            lines = []
+            # Strip whitespace
+            for line in data['description'].split('\n'):
+                lines.append(line.strip())
+            data['description'] = '\n'.join(lines)
+
             for i in range(len(data['description'])):
                 # (Try to) clean up colorcodes from description
-                if (data['description'][i] == '§') or (i != 0 and data['description'][i-1] == '§'):
-                    continue
-                description += data['description'][i]
-        embed.description = description
+                if i > 0 and data['description'][i-1] == '§' and data['description'][i] in self.LEGACY_COLOR_MAP:
+                    description = description[:-1] # Remove last §
+                    description += self.LEGACY_COLOR_MAP[data['description'][i]]
+                else:
+                    description += data['description'][i]
+        embed.description = f'```ansi\n{description}\n```'
 
         embed.add_field('Version', data['version']['name'])
         embed.add_field('Players', f"{data['players']['online']}/{data['players']['max']}")
