@@ -281,7 +281,6 @@ class MinecraftCommands(commands.Cog):
         else:
             embed.set_thumbnail(url='https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/78/Pack_64x64.png')
 
-        print(data['description'])
         if isinstance(data['description'], dict):
             # json text format
             desc = data['description']
