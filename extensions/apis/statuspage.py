@@ -37,7 +37,7 @@ class StatuspageComamnd(commands.Cog):
 
         Parameters
         ----------
-        service: Service to get status page from
+        service: Service to get status page for
         """
         await inter.response.defer()
 

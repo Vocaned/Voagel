@@ -4,7 +4,7 @@ from disnake.ext import commands
 
 
 class PingCommand(commands.Cog):
-    """Ping command."""
+    """Ping command"""
 
     def __init__(self, bot: lynn.Bot):
         self.bot = bot
