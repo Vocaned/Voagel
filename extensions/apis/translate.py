@@ -7,7 +7,7 @@ from disnake.ext import commands
 from pycountry import languages
 
 
-async def autocomplete_langs(inter, string: str) -> List[str]:
+async def autocomplete(inter, string: str) -> List[str]:
     langs = []
 
     for lang in languages:
@@ -61,8 +61,8 @@ class TranslateCommand(commands.Cog):
     async def translate(self,
         inter: disnake.ApplicationCommandInteraction,
         query: str,
-        _from: str = commands.Param('auto', name='from', autocomplete=autocomplete_langs),
-        to: str = commands.Param('eng', autocomplete=autocomplete_langs)
+        _from: str = commands.Param('auto', name='from', autocomplete=autocomplete),
+        to: str = commands.Param('eng', autocomplete=autocomplete)
     ):
         """
         Translate stuff using Google Translate. Defaults to Auto-Detect -> English

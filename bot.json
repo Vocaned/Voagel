@@ -2,7 +2,8 @@
     "secrets": {
         "discord": "DISCORD TOKEN HERE",
         "ocrspace": "",
-        "wolframalpha": ""
+        "wolframalpha": "",
+        "darksky": ""
     },
     "status": "online",
     "activity": null

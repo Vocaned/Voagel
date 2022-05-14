@@ -19,12 +19,13 @@ if __name__ == '__main__':
 
     logger.addHandler(ch)
 
+    bot.load_config()
+
     for extension in [f.replace('.py', '').replace('/', '.').replace('\\', '.') for f in glob.glob('extensions/**/*.py', recursive=True)]:
         try:
             bot.load_extension(extension)
         except (disnake.ClientException, ModuleNotFoundError):
             logging.error('Failed to load extension %s.', extension, exc_info=True)
 
-    bot.load_config()
     bot.status = disnake.Status(bot.config['status'])
     bot.run(bot.config['secrets']['discord'])
