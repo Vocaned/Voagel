@@ -1,30 +1,9 @@
 import disnake
 from disnake.ext import commands
-import lynn
-from typing import List
-import utils
 import datetime
 
-cities = []
-
-async def autocomplete(inter, string: str) -> List[str]:
-    result = []
-
-    if len(string) < 3:
-        return ['...',]
-
-    for city in cities:
-        if city.lower().startswith(string.lower()):
-            result.append(city)
-
-    for city in cities:
-        if string.lower() in city.lower().split(',')[0]:
-            if city not in result:
-                result.append(city)
-
-    result.append(string)
-
-    return result[:25]
+import lynn
+import utils
 
 class WeatherCommand(commands.Cog):
     """Weather command"""
@@ -32,27 +11,11 @@ class WeatherCommand(commands.Cog):
     def __init__(self, bot: lynn.Bot):
         self.bot = bot
 
-    async def cog_load(self):
-        # TODO: better list of cities
-        # Populate cities
-        global cities
-
-        tmp = []
-
-        j = await utils.rest('https://countriesnow.space/api/v0.1/countries')
-        assert not j['error']
-
-        for country in j['data']:
-            for city in country['cities']:
-                tmp.append(f'{city}, {country["country"]}')
-
-        cities = tmp
-
     # TODO: Dark Sky is EOL, switch weather API
     @commands.slash_command(guild_ids=[702953546106273852])
     async def weather(self,
         inter: disnake.ApplicationCommandInteraction,
-        location: str = commands.Param(autocomplete=autocomplete)
+        location: str
     ):
         """What's the weather like?
 

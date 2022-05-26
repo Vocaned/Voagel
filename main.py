@@ -3,7 +3,7 @@ import logging
 import disnake
 import lynn
 
-bot = lynn.Bot()
+bot = lynn.Bot(intents=disnake.Intents().all())
 
 @bot.event
 async def on_ready():
