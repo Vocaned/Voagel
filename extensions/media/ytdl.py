@@ -64,11 +64,11 @@ class YtdlCommand(commands.Cog):
                     info = ydl.extract_info(link, download=False)
                     if 'is_live' in info and info['is_live']:
                         raise yt_dl.DownloadError('Cannot download a livestream')
-                    if 'filesize' in info:
+                    if 'filesize' in info and info['filesize']:
                         if info['filesize'] > 100000000:
                             await inter.delete_original_message()
                             raise yt_dl.DownloadError(f'File is too large! ({utils.bytes2human(info["filesize"])})')
-                    elif 'filesize_approx' in info:
+                    elif 'filesize_approx' in info and info['filesize_approx']:
                         if info['filesize_approx'] > 100000000:
                             await inter.delete_original_message()
                             raise yt_dl.DownloadError(f'File is too large! ({utils.bytes2human(info["filesize_approx"])})')

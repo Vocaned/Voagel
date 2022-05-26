@@ -27,11 +27,11 @@ class ColorFormatter(logging.Formatter):
         return formatter.format(record)
 
 class Bot(commands.InteractionBot):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.config = {}
         self.data = {}
 
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
     def get_api_key(self, key: str) -> str:
         val = self.config['secrets'].get(key, None)

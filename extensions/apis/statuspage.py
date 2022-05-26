@@ -39,10 +39,10 @@ class StatuspageComamnd(commands.Cog):
         ----------
         service: Service to get status page for
         """
-        await inter.response.defer()
-
         if service not in statusPages:
             raise Exception('Invalid statuspage')
+
+        await inter.response.defer()
 
         page = statusPages[service]
 
