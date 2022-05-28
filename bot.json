@@ -3,7 +3,7 @@
         "discord": "DISCORD TOKEN HERE",
         "ocrspace": "",
         "wolframalpha": "",
-        "darksky": ""
+        "weatherapi": ""
     },
     "status": "online",
     "activity": null

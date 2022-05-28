@@ -11,7 +11,24 @@ class WeatherCommand(commands.Cog):
     def __init__(self, bot: lynn.Bot):
         self.bot = bot
 
-    # TODO: Dark Sky is EOL, switch weather API
+    def get_embed_color(self, data: dict) -> int:
+        if len(data['alerts']['alert']) > 0:
+            return 0xfe1111
+        if 'thunder' in data['current']['condition']['text'].lower():
+            return 0xfea011
+        if 'snow' in data['current']['condition']['text'].lower():
+            return 0xfefefe
+        if 'ice' in data['current']['condition']['text'].lower() or \
+           'blizzard' in data['current']['condition']['text'].lower():
+            return 0xa0fefe
+        if 'fog' in data['current']['condition']['text'].lower() or \
+           'mist' in data['current']['condition']['text'].lower() or \
+           'sleet' in data['current']['condition']['text'].lower() or \
+           'overcast' in data['current']['condition']['text'].lower():
+            return 0xa0a0a0
+
+        return 0xfefea0
+
     @commands.slash_command(guild_ids=[702953546106273852])
     async def weather(self,
         inter: disnake.ApplicationCommandInteraction,
@@ -27,36 +44,31 @@ class WeatherCommand(commands.Cog):
             raise Exception("You're supposed to enter a city. This isn't one.")
 
         await inter.response.defer()
-        geocoding = await utils.rest('https://nominatim.openstreetmap.org/search?format=json&limit=25&accept-language=en&q='+utils.escape_url(location))
-        if not geocoding:
-            raise Exception('Location not found.')
+        data = await utils.rest(f"https://api.weatherapi.com/v1/forecast.json?key={self.bot.get_api_key('weatherapi')}&q={utils.escape_url(location)}&aqi=yes&alerts=yes")
 
-        data = await utils.rest(f"https://api.darksky.net/forecast/{self.bot.get_api_key('darksky')}/{geocoding[0]['lat']},{geocoding[0]['lon']}?exclude=minutely,hourly,daily,flags&units=si")
+        if not data or 'error' in data:
+            if 'error' in data and 'message' in data['error']:
+                raise Exception(data['error']['message'])
+            raise Exception('Unknown error occured')
 
-        if 'alerts' in data and data['alerts']:
-            col = 0xff0000
-        else:
-            col = 0xffb347
+        location = [data['location']['name'], data['location']['region'], data['location']['country']]
+        location = [loc for loc in location if loc] # Remove empty strings from location
+        embed = disnake.Embed(title=f"{','.join(location)}")
+        embed.set_thumbnail(f"https:{data['current']['condition']['icon']}".replace('64x64', '128x128'))
 
-        embed = disnake.Embed(title=geocoding[0]['display_name'], color=col)
-        embed.set_thumbnail(f"https://darksky.net/images/weather-icons/{data['currently']['icon']}.png")
+        embed.add_field(data['current']['condition']['text'], f"**Temperature**: {data['current']['temp_c']}°C ({data['current']['temp_f']}°F)\n" \
+        + f"**Feels Like**: {data['current']['feelslike_c']}°C ({data['current']['feelslike_f']}°F)\n" \
+        + f"**Humidity**: {data['current']['humidity']}%\n" \
+        + f"**Clouds**: {data['current']['cloud']}%\n" \
+        + f"**Wind**: {round(data['current']['wind_kph'] / 3.6, 2)} m/s ({data['current']['wind_mph']} mph)\n" \
+        + f"\nSun from {data['forecast']['forecastday'][0]['astro']['sunrise']} to {data['forecast']['forecastday'][0]['astro']['sunset']}", inline=False)
 
-        if 'alerts' in data:
-            alerts = []
-            for alert in data['alerts']:
-                if len(alerts) > 3:
-                    continue
-                if alert['title'] not in alerts:
-                    embed.add_field(alert['title'], alert['description'][:1024], inline=False)
-                    alerts.append(alert['title'])
+        for alert in data['alerts']['alert'][:3]:
+            embed.add_field(f"{alert['severity']} {alert['msgtype']}: {alert['headline']}", alert['desc'][:1024])
 
-        embed.add_field(data['currently']['summary'], str(round(data['currently']['temperature'], 2)) + '°C (' + str(round(data['currently']['temperature'] * (9/5) + 32, 2)) + '°F)\n' \
-        + 'Feels Like: ' + str(round(data['currently']['apparentTemperature'], 2)) + '°C (' + str(round(data['currently']['apparentTemperature'] * (9/5) + 32, 2)) + '°F)\n' \
-        + 'Humidity: ' + str(round(data['currently']['humidity'] * 100, 2)) + '%\n' \
-        + 'Clouds: ' + str(round(data['currently']['cloudCover'] * 100, 2)) + '%\n' \
-        + 'Wind: ' + str(data['currently']['windSpeed']) + ' m/s (' + str(round(int(data['currently']['windSpeed']) * 2.2369362920544, 2)) + ' mph)', inline=False)
-        embed.set_footer(text='Powered by Dark Sky and OpenStreetMap')
-        embed.timestamp = datetime.datetime.fromtimestamp(data['currently']['time'], tz=datetime.timezone.utc)
+        embed.colour = self.get_embed_color(data)
+        embed.set_footer(text='Powered by WeatherAPI.com')
+        embed.timestamp = datetime.datetime.fromtimestamp(data['current']['last_updated_epoch'], tz=datetime.timezone.utc)
 
         await inter.send(embed=embed)
 
