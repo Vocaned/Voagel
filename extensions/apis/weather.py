@@ -44,16 +44,18 @@ class WeatherCommand(commands.Cog):
             raise Exception("You're supposed to enter a city. This isn't one.")
 
         await inter.response.defer()
-        data = await utils.rest(f"https://api.weatherapi.com/v1/forecast.json?key={self.bot.get_api_key('weatherapi')}&q={utils.escape_url(location)}&aqi=yes&alerts=yes")
+        geocoding = await utils.rest(f'https://nominatim.openstreetmap.org/search?format=json&limit=25&accept-language=en&q={utils.escape_url(location)}')
+        if not geocoding:
+            raise Exception('Location not found.')
+
+        data = await utils.rest(f"https://api.weatherapi.com/v1/forecast.json?key={self.bot.get_api_key('weatherapi')}&q={geocoding[0]['lat']},{geocoding[0]['lon']}&aqi=yes&alerts=yes")
 
         if not data or 'error' in data:
             if 'error' in data and 'message' in data['error']:
                 raise Exception(data['error']['message'])
             raise Exception('Unknown error occured')
 
-        location = [data['location']['name'], data['location']['region'], data['location']['country']]
-        location = [loc for loc in location if loc] # Remove empty strings from location
-        embed = disnake.Embed(title=f"{','.join(location)}")
+        embed = disnake.Embed(title=geocoding[0]['display_name'])
         embed.set_thumbnail(f"https:{data['current']['condition']['icon']}".replace('64x64', '128x128'))
 
         embed.add_field(data['current']['condition']['text'], f"**Temperature**: {data['current']['temp_c']}°C ({data['current']['temp_f']}°F)\n" \
@@ -64,10 +66,11 @@ class WeatherCommand(commands.Cog):
         + f"\nSun from {data['forecast']['forecastday'][0]['astro']['sunrise']} to {data['forecast']['forecastday'][0]['astro']['sunset']}", inline=False)
 
         for alert in data['alerts']['alert'][:3]:
-            embed.add_field(f"{alert['severity']} {alert['msgtype']}: {alert['headline']}", alert['desc'][:1024])
+            title = alert['severity']+' ' if alert['severity'] else '' + alert['msgtype'] if alert['msgtype'] else ''
+            embed.add_field(f"{title+': ' if title else ''}{alert['headline']}", (f"**{alert['event']}**" + ('\n'+alert['desc'] if alert['desc'] else ''))[:1024])
 
         embed.colour = self.get_embed_color(data)
-        embed.set_footer(text='Powered by WeatherAPI.com')
+        embed.set_footer(text='Powered by WeatherAPI.com and OpenStreetMap')
         embed.timestamp = datetime.datetime.fromtimestamp(data['current']['last_updated_epoch'], tz=datetime.timezone.utc)
 
         await inter.send(embed=embed)
