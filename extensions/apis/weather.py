@@ -12,8 +12,6 @@ class WeatherCommand(commands.Cog):
         self.bot = bot
 
     def get_embed_color(self, data: dict) -> int:
-        if len(data['alerts']['alert']) > 0:
-            return 0xfe1111
         if 'thunder' in data['current']['condition']['text'].lower():
             return 0xfea011
         if 'snow' in data['current']['condition']['text'].lower():
@@ -26,6 +24,9 @@ class WeatherCommand(commands.Cog):
            'sleet' in data['current']['condition']['text'].lower() or \
            'overcast' in data['current']['condition']['text'].lower():
             return 0xa0a0a0
+
+        if len(data['alerts']['alert']) > 0:
+            return 0xfa9090
 
         return 0xfefea0
 
