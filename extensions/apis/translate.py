@@ -48,11 +48,12 @@ class TranslateCommand(commands.Cog):
         else:
             inlang = inlang.name
 
-        confidence = ''
+        confidence = None
         if data[6] and data[6] != 1:
             confidence = f'(confidence: {round(data[6]*100)}%)'
 
-        embed = disnake.Embed(title='Google Translate', description=confidence, color=lynn.EMBED_COLOR)
+        embed = disnake.Embed(title='Google Translate', color=lynn.EMBED_COLOR)
+        embed.set_footer(text=confidence)
         embed.add_field(f'From `{inlang}`', query, inline=False)
         embed.add_field('To `English`', data[0][0][0], inline=False)
         await inter.send(embed=embed)

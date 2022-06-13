@@ -95,6 +95,7 @@ class YtdlCommand(commands.Cog):
                         await inter.delete_original_message()
                         return
                     elif view.response == 'compress':
+                        await inter.edit_original_message(f'Compressing {utils.bytes2human(size)} to 8MiB...')
                         await webhook.edit('Compressing video...', view=view)
                         fp = await utils.eight_mb(tmpdir, fp)
                     else:
@@ -103,7 +104,7 @@ class YtdlCommand(commands.Cog):
                         return
 
                 file = disnake.File(fp, filename=info['id'] + '.' + info['ext'], description='Source: ' + link)
-                await inter.edit_original_message(content='', file=file)
+                await inter.edit_original_message('', file=file)
                 if webhook is not None:
                     await webhook.edit('Compressed.')
             except FileNotFoundError as e:
