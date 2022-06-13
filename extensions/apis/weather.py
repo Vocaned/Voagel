@@ -66,9 +66,16 @@ class WeatherCommand(commands.Cog):
         + f"**Wind**: {round(data['current']['wind_kph'] / 3.6, 2)} m/s ({data['current']['wind_mph']} mph)\n" \
         + f"\nSun from {data['forecast']['forecastday'][0]['astro']['sunrise']} to {data['forecast']['forecastday'][0]['astro']['sunset']}", inline=False)
 
+        alerts = []
         for alert in data['alerts']['alert'][:3]:
+            # Don't show duplicate alerts
+            if alert['desc'] in alerts:
+                continue
+            alerts.append(alert['desc'])
+
             title = alert['severity']+' ' if alert['severity'] else '' + alert['msgtype'] if alert['msgtype'] else ''
             embed.add_field(f"{title+': ' if title else ''}{alert['headline']}", (f"**{alert['event']}**" + ('\n'+alert['desc'] if alert['desc'] else ''))[:1024])
+
 
         embed.colour = self.get_embed_color(data)
         embed.set_footer(text='Powered by WeatherAPI.com and OpenStreetMap')
