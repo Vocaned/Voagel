@@ -24,7 +24,7 @@ class SnowflakeCommand(commands.Cog):
         """
 
         embed = disnake.Embed(description=inter.options['snowflake'], color=lynn.EMBED_COLOR)
-        embed.add_field('Timestamp', snowflake.created_at.strftime('%c'), inline=False)
+        embed.add_field('Timestamp', f'<t:{int(snowflake.created_at.timestamp())}:F>', inline=False)
         embed.add_field('Internal Worker ID', (snowflake.id & 0x3E0000) >> 17, inline=False)
         embed.add_field('Internal Process ID', (snowflake.id & 0x1F000) >> 12, inline=False)
         embed.add_field('Increment', snowflake.id & 0xFFF, inline=False)
