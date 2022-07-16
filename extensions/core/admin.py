@@ -78,7 +78,7 @@ class AdminCommands(commands.Cog):
         """Pull the git repo"""
         await inter.response.defer()
         out1 = await utils.check_output(['git', 'pull'], timeout=30)
-        out2 = await utils.check_output(['git', 'log', '@{1}..', '--format="%h %an | %B%n%N"'], timeout=30)
+        out2 = await utils.check_output(['git', 'log', '@{1}..', '--format=%h %an | %B'], timeout=30)
         await inter.send(f'```{out1}\n\n{out2}```')
 
     @git.sub_command()
