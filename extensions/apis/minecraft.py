@@ -87,8 +87,8 @@ class MinecraftCommands(commands.Cog):
         j = await utils.rest(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}', returns='json')
         try:
             val = j['properties'][0]['value']
-        except KeyError:
-            raise Exception("Mojang's servers didn't return valid skin data.")
+        except KeyError as e:
+            raise Exception("Mojang's servers didn't return valid skin data.") from e
 
         return json.loads(base64.b64decode(val))
 
@@ -165,7 +165,7 @@ class MinecraftCommands(commands.Cog):
 
 
     @commands.slash_command(guild_ids=[702953546106273852])
-    async def minecraft(self, inter: disnake.ApplicationCommandInteraction):
+    async def minecraft(self, _: disnake.ApplicationCommandInteraction):
         ...
 
     @minecraft.sub_command()
@@ -249,7 +249,7 @@ class MinecraftCommands(commands.Cog):
                 return data
         except socket.timeout as e:
             if not valid:
-                raise Exception('Could not connect to server. Make sure the IP is valid.')
+                raise Exception('Could not connect to server. Make sure the IP is valid.') from e
             raise e
 
     @minecraft.sub_command()

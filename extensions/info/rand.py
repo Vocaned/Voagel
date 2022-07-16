@@ -11,10 +11,8 @@ class RandomCommands(commands.Cog):
 
     @commands.slash_command(guild_ids=[702953546106273852])
     async def dice(self, inter: disnake.ApplicationCommandInteraction, query: str):
-        """Rolls n dice with set amount of faces. Default 1d6. For example:
-        1d6 = 1 dice with 6 faces.
-        2d10 = 2 dices with 10 faces each.
-        
+        """Rolls n dice with set amount of faces. Default 1d6.
+
         Parameters
         ----------
         query: Parameters of the dice you want to roll
@@ -60,9 +58,9 @@ class RandomCommands(commands.Cog):
 
         Parameters
         ----------
-        choices: List of possible choices, separated by a comma
+        choices: List of possible choices, separated by a semicolon
         """
-        await inter.send(f"Picked **{random.choice(choices.split(',')).strip()}**.")
+        await inter.send(f"Picked **{random.choice(choices.split(';')).strip()}**.")
 
 def setup(bot: lynn.Bot):
     bot.add_cog(RandomCommands(bot))
