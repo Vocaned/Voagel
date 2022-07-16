@@ -146,4 +146,6 @@ def timedelta_format(delta: timedelta):
     if num_minutes > 0:
         ret.append(f'{num_minutes} minutes')
 
+    if not ret:
+        ret.append('Less than a minute')
     return ' '.join(ret)
