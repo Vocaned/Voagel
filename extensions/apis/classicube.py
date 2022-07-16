@@ -43,15 +43,15 @@ class ClassicubeCommand(commands.Cog):
         data = await utils.rest(f'https://www.classicube.net/api/player/{username}')
         if not data or data['error'] != '':
             raise Exception(data['error'] if data and data['error'] else 'User not found')
-        
+
         flags = data['flags']
         embed = disnake.Embed(title='ClassiCube User', colour=0x977dab)
         embed.set_footer(text=f'ID: {data["id"]}', icon_url='https://www.classicube.net/static/img/cc-cube-small.png')
         embed.timestamp = datetime.utcnow()
 
         embed.set_image(url='https://123dmwm.com/img/3d.php?user='+data['username'])
-        embed.set_author(name=data['username'], icon_url='https://classicube.s3.amazonaws.com/face/'+data['username'])
-        embed.add_field(name='Account created', value=f'On <t:{data["registered"]}:f>\n<t:{data["registered"]}:R> ago')
+        embed.set_author(name=data['username'], icon_url=f'https://classicube.s3.amazonaws.com/face/{data["username"]}.png')
+        embed.add_field(name='Account created', value=f'On <t:{data["registered"]}:F>\n<t:{data["registered"]}:R>')
 
         if flags:
             embed.add_field(name='Notes', value=', '.join([self.FLAGS[n] for n in flags]))
