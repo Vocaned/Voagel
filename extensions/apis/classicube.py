@@ -48,10 +48,11 @@ class ClassicubeCommand(commands.Cog):
         embed = disnake.Embed(title='ClassiCube User', colour=0x977dab)
         embed.set_footer(text=f'ID: {data["id"]}', icon_url='https://www.classicube.net/static/img/cc-cube-small.png')
         embed.timestamp = datetime.utcnow()
+        delta = datetime.utcnow() - datetime.utcfromtimestamp(data['registered'])
 
         embed.set_image(url='https://123dmwm.com/img/3d.php?user='+data['username'])
         embed.set_author(name=data['username'], icon_url=f'https://classicube.s3.amazonaws.com/face/{data["username"]}.png')
-        embed.add_field(name='Account created', value=f'On <t:{data["registered"]}:F>\n<t:{data["registered"]}:R>')
+        embed.add_field(name='Account created', value=f'<t:{data["registered"]}:F>\n{utils.timedelta_format(delta)}')
 
         if flags:
             embed.add_field(name='Notes', value=', '.join([self.FLAGS[n] for n in flags]))

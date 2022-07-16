@@ -5,6 +5,7 @@ import asyncio
 import os
 import logging
 import html.parser
+from datetime import timedelta
 
 async def rest(url: str, method='GET', headers=None, data=None, auth=None, returns: typing.Union[str, typing.Tuple[str]] = 'json') -> typing.Union[object, typing.List[object]]:
     async with aiohttp.ClientSession() as s:
@@ -125,3 +126,24 @@ class OpenGraphParser(html.parser.HTMLParser):
                 v = attr[1]
         if k and v:
             self.tags[k] = v
+
+def timedelta_format(delta: timedelta):
+    ret = []
+    num_years = int(delta.days / 365)
+    if num_years > 0:
+        delta -= timedelta(days=num_years * 365)
+        ret.append(f'{num_years} years')
+
+    if delta.days > 0:
+        ret.append(f'{delta.days} days')
+
+    num_hours = int(delta.seconds / 3600)
+    if num_hours > 0:
+        delta -= timedelta(hours=num_hours)
+        ret.append(f'{num_hours} hours')
+
+    num_minutes = int(delta.seconds / 60)
+    if num_minutes > 0:
+        ret.append(f'{num_minutes} minutes')
+
+    return ' '.join(ret)
