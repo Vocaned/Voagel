@@ -97,7 +97,11 @@ class YtdlCommand(commands.Cog):
                     elif view.response == 'compress':
                         await inter.edit_original_message(f'Compressing {utils.bytes2human(size)} to 8MiB...')
                         await webhook.edit('Compressing video...', view=view)
-                        fp = await utils.eight_mb(tmpdir, fp)
+                        try:
+                            fp = await utils.eight_mb(tmpdir, fp)
+                        except TimeoutError as e:
+                            await webhook.edit('Process timed out. Donate so the bot owner can get a proper server to host the bot on.', view=view)
+                            raise e
                     else:
                         await webhook.edit('Cancelled.', view=view)
                         await inter.delete_original_message()
