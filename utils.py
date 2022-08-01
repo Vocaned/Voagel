@@ -47,6 +47,13 @@ async def rest(url: str, method='GET', headers=None, data=None, auth=None, retur
 def escape_url(url: str) -> str:
     return urllib.parse.quote(url)
 
+async def re_encode(fp: str) -> None:
+    if not os.path.exists(fp):
+        raise Exception("File passed to ReEndcode doesn't exist")
+
+    await check_output(['ffmpeg', '-y', '-i', fp, f'{fp}_2'])
+    os.replace(f'{fp}_2', fp)
+
 async def eight_mb(tmpdir: str, fp: str) -> str:
     size = os.path.getsize(fp)
     origsize = size

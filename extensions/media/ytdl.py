@@ -107,6 +107,11 @@ class YtdlCommand(commands.Cog):
                         await inter.delete_original_message()
                         return
 
+                if link.split('//', 1)[-1].lstrip('www.').startswith('tiktok.com'):
+                    # Tiktok downloads don't work on Discord by default
+                    await inter.edit_original_message('Re-encoding video to fix TikTok download..')
+                    await utils.re_encode(fp)
+
                 file = disnake.File(fp, filename=info['id'] + '.' + info['ext'], description='Source: ' + link)
                 await inter.edit_original_message('', file=file)
                 if webhook is not None:
