@@ -51,8 +51,10 @@ async def re_encode(fp: str) -> None:
     if not os.path.exists(fp):
         raise Exception("File passed to ReEndcode doesn't exist")
 
-    await check_output(['ffmpeg', '-y', '-i', fp, f'{fp}_2'])
-    os.replace(f'{fp}_2', fp)
+    await check_output(['ffmpeg', '-y', '-i', fp, f'2{fp}'])
+    if not os.path.exists(f'2{fp}'):
+        raise Exception('Video encoding failed.')
+    os.replace(f'2{fp}', fp)
 
 async def eight_mb(tmpdir: str, fp: str) -> str:
     size = os.path.getsize(fp)
