@@ -49,11 +49,11 @@ def escape_url(url: str) -> str:
 
 async def re_encode(fp: str) -> None:
     if not os.path.exists(fp):
-        raise Exception("File passed to ReEndcode doesn't exist")
+        raise Exception("File passed to Re-Encode doesn't exist")
 
-    await check_output(['ffmpeg', '-y', '-i', fp, f'2{fp}'])
+    out = await check_output(['ffmpeg', '-y', '-i', '-c:a', 'copy', fp, f'2{fp}'])
     if not os.path.exists(f'2{fp}'):
-        raise Exception('Video encoding failed.')
+        raise Exception('Video encoding failed: \n'+out)
     os.replace(f'2{fp}', fp)
 
 async def eight_mb(tmpdir: str, fp: str) -> str:
