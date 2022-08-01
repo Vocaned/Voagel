@@ -53,7 +53,9 @@ class YtdlCommand(commands.Cog):
             'geo_bypass': True,
             'no_color': True,
             'restrictfilenames': True,
-            'quiet': True
+            'quiet': True,
+            'merge_output_format': 'mp4',
+            'format': 'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4] / bv*+ba/b' # Download the best mp4 video available, or the best video if no mp4 available
         }
 
         with tempfile.TemporaryDirectory() as tmpdir:
