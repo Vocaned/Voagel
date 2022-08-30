@@ -18,7 +18,7 @@ class DatamineCommand(commands.Cog):
     async def guild_experiment_placement(self,
         inter: disnake.ApplicationCommandInteraction,
         experiment_id: str,
-        guild_id: int
+        guild_id: str
     ):
         """Get experiment bucket range for specific experiment and guild
 
