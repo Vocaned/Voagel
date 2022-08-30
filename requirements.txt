@@ -2,3 +2,4 @@ disnake==2.5.1
 pycountry==22.1.10
 feedparser==6.0.8
 yt-dlp==2022.5.18
+mmh3==3.0.0
