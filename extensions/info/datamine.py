@@ -20,14 +20,14 @@ class DatamineCommand(commands.Cog):
         experiment_id: str,
         guild_id: int
     ):
-        """Get experiment bucket for specific experiment and guild
+        """Get experiment bucket range for specific experiment and guild
 
         Parameters
         ----------
         experiment_id: ID (string) of the experiment
         guild_id: ID (int) of the guild"""
         m = mmh3.hash(f'{experiment_id}:{guild_id}'.encode(), signed=False) % 10000
-        await inter.send(f'{guild_id} is in {experiment_id} bucket {m}')
+        await inter.send(f'`{guild_id}` is in `{experiment_id}` bucket range **{m}**')
 
 
 def setup(bot: lynn.Bot):
