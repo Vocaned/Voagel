@@ -53,8 +53,11 @@ class TranslateCommand(commands.Cog):
             confidence = f'(confidence: {round(data[6]*100)}%)'
 
         outtext = []
-        for block in data[0]:
-            outtext.append(block)
+        if isinstance(data[0], list):
+            for block in data[0]:
+                outtext.append(block[0])
+        else:
+            outtext.append(data[0][0][0])
 
         embed = disnake.Embed(title='Google Translate', color=lynn.EMBED_COLOR)
         if confidence:
@@ -117,8 +120,11 @@ class TranslateCommand(commands.Cog):
             confidence = f'(confidence: {round(data[6]*100)}%)'
 
         outtext = []
-        for block in data[0]:
-            outtext.append(block)
+        if isinstance(data[0], list):
+            for block in data[0]:
+                outtext.append(block[0])
+        else:
+            outtext.append(data[0][0][0])
 
         embed = disnake.Embed(title='Google Translate', description=confidence, color=lynn.EMBED_COLOR)
         embed.add_field(f'From `{inlang}`', query, inline=False)
