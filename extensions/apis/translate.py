@@ -52,11 +52,15 @@ class TranslateCommand(commands.Cog):
         if data[6] and data[6] != 1:
             confidence = f'(confidence: {round(data[6]*100)}%)'
 
+        outtext = []
+        for block in data[0]:
+            outtext.append(block)
+
         embed = disnake.Embed(title='Google Translate', color=lynn.EMBED_COLOR)
         if confidence:
             embed.set_footer(text=confidence)
         embed.add_field(f'From `{inlang}`', query, inline=False)
-        embed.add_field('To `English`', data[0][0][0], inline=False)
+        embed.add_field('To `English`', ' '.join(outtext), inline=False)
         await inter.send(embed=embed)
 
     @commands.slash_command(guild_ids=[702953546106273852])
@@ -112,9 +116,13 @@ class TranslateCommand(commands.Cog):
         if data[6] and data[6] != 1:
             confidence = f'(confidence: {round(data[6]*100)}%)'
 
+        outtext = []
+        for block in data[0]:
+            outtext.append(block)
+
         embed = disnake.Embed(title='Google Translate', description=confidence, color=lynn.EMBED_COLOR)
         embed.add_field(f'From `{inlang}`', query, inline=False)
-        embed.add_field(f'To `{outlang}`', data[0][0][0], inline=False)
+        embed.add_field(f'To `{outlang}`', ' '.join(outtext), inline=False)
         await inter.send(embed=embed)
 
 def setup(bot: lynn.Bot):
