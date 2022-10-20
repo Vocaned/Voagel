@@ -66,6 +66,8 @@ class StatuspageComamnd(commands.Cog):
             embed.add_field('\U00002063', '\U00002063', inline=False)
             for metric in page[1]:
                 m = await utils.rest(f"{page[0]}/metrics-display/{metric}/day.json", returns='json')
+                if 'summary' not in m or 'last' not in m['summary']:
+                    continue
                 last = m['summary']['last']
                 last = str(round(last, 2)) if last else '0'
                 embed.add_field(m['metrics'][0]['metric']['name'], last)
