@@ -14,16 +14,21 @@ class HowlongtobeatCommand(commands.Cog):
         inter: disnake.ApplicationCommandInteraction,
         game: str
     ):
-        """How long does a game take to beat?"""
+        """How long does a game take to beat?
+
+        Parameters
+        ----------
+        game: Game's name
+        """
         results = await HowLongToBeat().async_search(game)
         if results is not None and len(results) > 0:
             result = max(results, key=lambda element: element.similarity)
             embed = disnake.Embed(title='How Long to Beat', color=lynn.EMBED_COLOR)
             embed.set_author(name=result.game_name, url=result.game_web_link)
-            embed.add_field('Main Story', result.main_story + ' Hours')
-            embed.add_field('Main + Extra', result.main_extra + ' Hours')
-            embed.add_field('Completionist', result.completionist + ' Hours')
-            embed.add_field('All Styles', result.all_styles + ' Hours')
+            embed.add_field('Main Story', f'{result.main_story} Hours')
+            embed.add_field('Main + Extra', f'{result.main_extra} Hours')
+            embed.add_field('Completionist', f'{result.completionist} Hours')
+            embed.add_field('All Styles', f'{result.all_styles} Hours')
             await inter.send(embed=embed)
             return
 
