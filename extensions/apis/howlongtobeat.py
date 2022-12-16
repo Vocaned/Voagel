@@ -23,12 +23,10 @@ class HowlongtobeatCommand(commands.Cog):
         results = await HowLongToBeat().async_search(game)
         if results is not None and len(results) > 0:
             result = max(results, key=lambda element: element.similarity)
-            embed = disnake.Embed(title='How Long to Beat', color=lynn.EMBED_COLOR)
-            embed.set_author(name=result.game_name, url=result.game_web_link)
+            embed = disnake.Embed(title=f'How Long to Beat: {result.game_name}', url=result.game_web_link, color=lynn.EMBED_COLOR)
             embed.add_field('Main Story', f'{result.main_story} Hours')
             embed.add_field('Main + Extra', f'{result.main_extra} Hours')
             embed.add_field('Completionist', f'{result.completionist} Hours')
-            embed.add_field('All Styles', f'{result.all_styles} Hours')
 
             if result.game_image_url:
                 embed.set_thumbnail(result.game_image_url)
