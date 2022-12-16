@@ -3,3 +3,4 @@ pycountry==22.1.10
 feedparser==6.0.8
 yt-dlp==2022.5.18
 mmh3==3.0.0
+howlongtobeatpy==1.0.5
