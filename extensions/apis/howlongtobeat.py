@@ -29,6 +29,10 @@ class HowlongtobeatCommand(commands.Cog):
             embed.add_field('Main + Extra', f'{result.main_extra} Hours')
             embed.add_field('Completionist', f'{result.completionist} Hours')
             embed.add_field('All Styles', f'{result.all_styles} Hours')
+
+            if result.game_image_url:
+                embed.set_thumbnail(result.game_image_url)
+
             await inter.send(embed=embed)
             return
 
