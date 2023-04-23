@@ -84,8 +84,8 @@ class YtdlCommand(commands.Cog):
                 fp = tmpdir + '/' + info['id'] + '.' + info['ext']
                 size = os.path.getsize(fp)
                 webhook = None
-                if size > 8000000:
-                    if size > 105000000:
+                if size > 26214400: # 25 MiB
+                    if size > 104857600: # 100 MiB
                         raise yt_dl.DownloadError(f'File is too large! ({utils.bytes2human(size)})')
 
                     view = CompressQuestion()
