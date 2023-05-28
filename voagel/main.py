@@ -41,9 +41,9 @@ def main() -> None:
     bot.load_config()
 
     # TODO: clean up this mess
-    for extension in [str(f.resolve()).replace('.py', '').replace('/', '.').replace('\\', '.').split('voagel.')[-1] for f in Path(__file__).parent.rglob('extensions/**/*.py')]:
+    for extension in [str(f.resolve()).replace('.py', '').replace('/', '.').replace('\\', '.').split('voagel.extensions.')[-1] for f in Path(__file__).parent.rglob('extensions/**/*.py')]:
         try:
-            bot.load_extension('voagel.' + extension)
+            bot.load_extension('voagel.extensions.' + extension)
         except (disnake.ClientException, ModuleNotFoundError):
             logging.error('Failed to load extension %s', extension, exc_info=True)
 
