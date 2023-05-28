@@ -1,5 +1,3 @@
-# Lynn5
+# Voagel
 
-Rewrite of [Lynn4](https://github.com/Fam0r/Lynn4) which was a rewrite of [Lynn3](https://github.com/Fam0r/Lynn3) which was a port of Lynn2.5 which was a port of Lynn2 which was a rewrite of Lynn.
-
-Yes I'm rewriting my bot every other year at this point. Discord API has massively changed and so have the libraries.
+A successor for [Lynn4](https://github.com/Fam0r/Lynn4), [Lynn3](https://github.com/Fam0r/Lynn3), Lynn2.5, [Lynn2](https://github.com/Fam0r/SharpLynn) and [Lynn](https://github.com/Fam0r/DiscordLynn).

@@ -27,5 +27,6 @@ if __name__ == '__main__':
         except (disnake.ClientException, ModuleNotFoundError):
             logging.error('Failed to load extension %s.', extension, exc_info=True)
 
-    bot.status = disnake.Status(bot.config['status'])
+    bot.status = disnake.Status(bot.config['bot']['status'])
+    bot.activity = disnake.Activity(name=bot.config['bot']['activity'], type=bot.config['bot']['activity_type'])
     bot.run(bot.config['secrets']['discord'])
