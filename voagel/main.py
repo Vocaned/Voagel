@@ -1,4 +1,3 @@
-import glob
 import logging
 import disnake
 import sys
@@ -41,11 +40,12 @@ def main() -> None:
     bot = Bot(intents=disnake.Intents.default())
     bot.load_config()
 
-    for extension in [f.replace('.py', '').replace('/', '.').replace('\\', '.') for f in glob.glob('extensions/**/*.py', recursive=True)]:
+    # TODO: clean up this mess
+    for extension in [str(f.resolve()).replace('.py', '').replace('/', '.').replace('\\', '.').split('voagel.')[-1] for f in Path(__file__).parent.rglob('extensions/**/*.py')]:
         try:
-            bot.load_extension(extension)
+            bot.load_extension('voagel.' + extension)
         except (disnake.ClientException, ModuleNotFoundError):
-            logging.error('Failed to load extension %s.', extension, exc_info=True)
+            logging.error('Failed to load extension %s', extension, exc_info=True)
 
     bot.status = disnake.Status(bot.config['bot']['status'])
 
