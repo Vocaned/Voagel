@@ -1,0 +1,6 @@
+services:
+  bot:
+    build: .
+    volumes:
+      - ./src:/app
+    restart: unless-stopped
