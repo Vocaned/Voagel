@@ -1,15 +1,16 @@
 import disnake
 from disnake.ext import commands
-import lynn
 import mmh3
+
+from voagel.main import Bot
 
 class DatamineCommand(commands.Cog):
     """Datamine commands"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command(guild_ids=[720561341974446102])
     async def datamine(self, inter: disnake.ApplicationCommandInteraction):
         """Secret Discord stuff"""
         ...
@@ -30,5 +31,5 @@ class DatamineCommand(commands.Cog):
         await inter.send(f'`{guild_id}` is in `{experiment_id}` bucket range **{m}**')
 
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(DatamineCommand(bot))

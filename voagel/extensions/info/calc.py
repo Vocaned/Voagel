@@ -3,8 +3,9 @@ import operator
 import re
 
 import disnake
-import lynn
 from disnake.ext import commands
+
+from voagel.main import Bot
 
 """calclib - Stuff used by calc"""
 
@@ -21,11 +22,7 @@ from disnake.ext import commands
 #          |                  |                |                  |
 #        string         list of tokens   tokens in RPN          number
 
-# Python 3.x support
-try:
-    reduce
-except NameError:
-    from functools import reduce
+from functools import reduce
 
 LEFT, RIGHT = 1, 2
 UNARY, BINARY = 1, 2
@@ -317,10 +314,10 @@ def eval_rpn(tokens):
 class CalculatorCommand(commands.Cog):
     """Calculator"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def calculator(self,
         inter: disnake.ApplicationCommandInteraction,
         expression: str
@@ -338,5 +335,5 @@ class CalculatorCommand(commands.Cog):
         expr = eval_rpn(expr)
         await inter.send(f'> `{orig_expr} = {expr}`')
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(CalculatorCommand(bot))

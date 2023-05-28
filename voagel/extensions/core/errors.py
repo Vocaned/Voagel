@@ -2,12 +2,13 @@ import logging
 import traceback
 
 import disnake
-import lynn
 from disnake.ext import commands
+
+from voagel.main import Bot, ERROR_COLOR
 
 
 class Errors(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.Cog.listener()
@@ -43,7 +44,7 @@ class Errors(commands.Cog):
         errmsg = None
 
         if isinstance(error, commands.BotMissingPermissions):
-            missing = [perm.replace('_', ' ').title() for perm in error.missing_perms]
+            missing = [perm.replace('_', ' ').title() for perm in error.missing_permissions]
             if len(missing) > 2:
                 fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
             else:
@@ -59,7 +60,7 @@ class Errors(commands.Cog):
             errtype = 'This command is on cooldown'
             errmsg = f'Please try again in {round(error.retry_after)}s'
         elif isinstance(error, commands.MissingPermissions):
-            missing = [perm.replace('_', ' ').title() for perm in error.missing_perms]
+            missing = [perm.replace('_', ' ').title() for perm in error.missing_permissions]
             if len(missing) > 2:
                 fmt = f'{"**, **".join(missing[:-1])}, and {missing[-1]}'
             else:
@@ -86,8 +87,8 @@ class Errors(commands.Cog):
             original = getattr(error, 'original', error)
             errmsg = f'{type(original).__name__}: {original}'
 
-        embed = disnake.Embed(color=lynn.ERROR_COLOR, title=errtype, description=errmsg)
+        embed = disnake.Embed(color=ERROR_COLOR, title=errtype, description=errmsg)
         await inter.send(embed=embed, ephemeral=True)
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(Errors(bot))

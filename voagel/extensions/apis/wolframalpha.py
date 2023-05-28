@@ -1,18 +1,19 @@
 from io import BytesIO
 
 import disnake
-import lynn
-import utils
 from disnake.ext import commands
+
+from voagel.main import Bot
+from voagel.utils import escape_url
 
 
 class WolframAlphaCommand(commands.Cog):
     """Wolfram Alpha"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def wolframalpha(self,
         inter: disnake.ApplicationCommandInteraction,
         query: str
@@ -26,27 +27,26 @@ class WolframAlphaCommand(commands.Cog):
         """
 
         await inter.response.defer()
-        data, status = await utils.rest(
-            f"http://api.wolframalpha.com/v1/simple?appid={self.bot.get_api_key('wolframalpha')}&layout=labelbar&ip=None&units=metric&background=2F3136&foreground=white&i={utils.escape_url(query)}",
-            returns=('raw', 'status')
+        req = await self.bot.session.get(
+            f'http://api.wolframalpha.com/v1/simple?appid={self.bot.get_api_key("wolframalpha")}&layout=labelbar&ip=None&units=metric&background=2F3136&foreground=white&i={escape_url(query)}'
         )
 
-        if status != 200:
-            err = data.decode('utf-8')
+        if req.status != 200:
+            err = req.text()
             if not err:
                 err = '[unknown error]'
 
-            if status == 501:
+            if req.status == 501:
                 raise Exception('WolframAlpha could not parse the query', err)
-            raise Exception(f'WolframAlpha returned an error status {status}', err)
+            raise Exception(f'WolframAlpha returned an error status {req.status}', err)
 
+        data = await req.read()
         if len(data) == 0:
             raise Exception('WolframAlpha did not return any data.')
 
-        data = BytesIO(data)
-        file = disnake.File(data, 'wolfram.png')
+        file = disnake.File(BytesIO(data), 'wolfram.png')
         await inter.send(file=file)
 
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(WolframAlphaCommand(bot))

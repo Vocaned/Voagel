@@ -1,14 +1,13 @@
 import disnake
 from disnake.ext import commands
-import lynn
-import utils
 from datetime import datetime
-
+from voagel.main import Bot
+from voagel.utils import escape_url, timedelta_format
 
 class ClassicubeCommand(commands.Cog):
     """Classicube commands"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     FLAGS = {
@@ -22,7 +21,7 @@ class ClassicubeCommand(commands.Cog):
         'r': 'Recovering account'
     }
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def classicube(self, _: disnake.ApplicationCommandInteraction):
         ...
 
@@ -38,9 +37,10 @@ class ClassicubeCommand(commands.Cog):
         username: Username of the player
         """
         await inter.response.defer()
-        username = utils.escape_url(username)
+        username = escape_url(username)
 
-        data = await utils.rest(f'https://www.classicube.net/api/player/{username}')
+        req = await self.bot.session.get(f'https://www.classicube.net/api/player/{username}')
+        data = await req.json()
         if not data or data['error'] != '':
             raise Exception(data['error'] if data and data['error'] else 'User not found')
 
@@ -52,7 +52,7 @@ class ClassicubeCommand(commands.Cog):
 
         embed.set_image(url='https://123dmwm.com/img/3d.php?user='+data['username'])
         embed.set_author(name=data['username'], icon_url=f'https://classicube.s3.amazonaws.com/face/{data["username"]}.png')
-        embed.add_field(name='Account created', value=f'<t:{data["registered"]}:F>\n`{utils.timedelta_format(delta)}` ago')
+        embed.add_field(name='Account created', value=f'<t:{data["registered"]}:F>\n`{timedelta_format(delta)}` ago')
 
         if flags:
             embed.add_field(name='Notes', value=', '.join([self.FLAGS[n] for n in flags]))
@@ -61,5 +61,5 @@ class ClassicubeCommand(commands.Cog):
 
         await inter.send(embed=embed)
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(ClassicubeCommand(bot))

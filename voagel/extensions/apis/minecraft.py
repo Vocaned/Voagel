@@ -1,21 +1,20 @@
 import disnake
-import lynn
 from disnake.ext import commands
-import utils
+from typing import Any
 import json
 import base64
 from datetime import datetime
 import socket
 import time
 import struct
-from typing import Tuple
 from io import BytesIO
+from voagel.main import Bot, EMBED_COLOR
 
 
 class MinecraftCommands(commands.Cog):
     """Minecraft Commands"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     LEGACY_COLOR_MAP = {
@@ -69,22 +68,23 @@ class MinecraftCommands(commands.Cog):
     }
 
     async def get_UUID(self, name: str) -> str:
-        status, text = await utils.rest(f'https://api.mojang.com/users/profiles/minecraft/{name}', returns=('status', 'text'))
-        if status == 200:
-            j = json.loads(text)
+        req = await self.bot.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
+        if req.status == 200:
+            j = json.loads(await req.text())
             if 'id' in j:
                 return j['id']
 
-        status, text = await utils.rest(f'https://api.mojang.com/users/profiles/minecraft/{name}?at=0', returns=('status', 'text'))
-        if status == 200:
-            j = json.loads(text)
+        req = await self.bot.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}?at=0')
+        if req.status == 200:
+            j = json.loads(await req.text())
             if 'id' in j:
                 return j['id']
 
         raise Exception('Player not found')
 
     async def get_skin(self, uuid: str) -> dict:
-        j = await utils.rest(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}', returns='json')
+        req = await self.bot.session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}')
+        j = await req.json()
         try:
             val = j['properties'][0]['value']
         except KeyError as e:
@@ -164,7 +164,7 @@ class MinecraftCommands(commands.Cog):
         return byte
 
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def minecraft(self, _: disnake.ApplicationCommandInteraction):
         ...
 
@@ -183,7 +183,8 @@ class MinecraftCommands(commands.Cog):
 
         uuid = await self.get_UUID(username)
         skin = await self.get_skin(uuid)
-        history = await utils.rest(f'https://api.mojang.com/user/profiles/{uuid}/names', returns='json')
+        req = await self.bot.session.get(f'https://api.mojang.com/user/profiles/{uuid}/names')
+        history = await req.json()
 
         names = []
         user = history[-1]['name']
@@ -194,7 +195,7 @@ class MinecraftCommands(commands.Cog):
         names[0] += ' **[CURRENT]**'
 
         embeds = []
-        embed = disnake.Embed(title='Minecraft Player', color=lynn.EMBED_COLOR)
+        embed = disnake.Embed(title='Minecraft Player', color=EMBED_COLOR)
         embed.set_author(name=user, icon_url=f'https://crafatar.com/avatars/{uuid}.png')
         embed.add_field('Name History', '\n'.join(names), inline=False)
         embed.set_footer(text=f'UUID: {uuid}', icon_url='https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-96x96.png')
@@ -208,21 +209,21 @@ class MinecraftCommands(commands.Cog):
         embeds.append(embed)
 
         if 'CAPE' in skin['textures']:
-            embed = disnake.Embed(title='Minecraft Cape', color=lynn.EMBED_COLOR)
+            embed = disnake.Embed(title='Minecraft Cape', color=EMBED_COLOR)
             embed.set_author(name=user, icon_url=f'https://crafatar.com/avatars/{uuid}.png')
             embed.set_image(url=skin['textures']['CAPE']['url'])
             embeds.append(embed)
 
-        of = await utils.rest(f'http://s.optifine.net/capes/{user}.png', returns='status')
-        if of == 200:
-            embed = disnake.Embed(title='Optifine Cape', color=lynn.EMBED_COLOR)
+        of = await self.bot.session.get(f'http://s.optifine.net/capes/{user}.png')
+        if of.status == 200:
+            embed = disnake.Embed(title='Optifine Cape', color=EMBED_COLOR)
             embed.set_author(name=user, icon_url=f'https://crafatar.com/avatars/{uuid}.png')
             embed.set_image(url=f'http://s.optifine.net/capes/{user}.png')
             embeds.append(embed)
 
         await inter.send(embeds=embeds)
 
-    def query_server(self, ip: str, port: str) -> Tuple[dict, int]:
+    def query_server(self, ip: str, port: str) -> dict[str, Any]:
         valid = False
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as conn:
@@ -270,10 +271,10 @@ class MinecraftCommands(commands.Cog):
 
         data = await self.bot.loop.run_in_executor(None, self.query_server, ip, port)
 
-        embed = disnake.Embed(color=lynn.EMBED_COLOR)
+        embed = disnake.Embed(color=EMBED_COLOR)
         embed.timestamp = datetime.utcnow()
         embed.title = ip + (f':{port}' if port != 25565 else '')
-        embed.set_footer(icon_url='https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-96x96.png')
+        embed.set_footer(text='.', icon_url='https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-96x96.png')
 
         if 'favicon' in data and data['favicon']:
             favicon = disnake.File(BytesIO(base64.b64decode(data['favicon'].replace('data:image/png;base64,', ''))), 'pack.png')
@@ -340,5 +341,5 @@ class MinecraftCommands(commands.Cog):
 
         await inter.send(embed=embed)
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(MinecraftCommands(bot))

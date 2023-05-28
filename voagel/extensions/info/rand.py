@@ -1,15 +1,16 @@
 import disnake
 from disnake.ext import commands
-import lynn
 import random
+
+from voagel.main import Bot
 
 class RandomCommands(commands.Cog):
     """Random commands"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def dice(self, inter: disnake.ApplicationCommandInteraction, query: str):
         """Rolls n dice with set amount of faces. Default 1d6.
 
@@ -43,7 +44,7 @@ class RandomCommands(commands.Cog):
         roll = random.randint(n, n*f)
         await inter.send(f"You roll {n} {'dice' if n > 1 else 'die'} with {f} face{'s' if f > 1 else ''}. You rolled **{roll}**!")
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def coinflip(self, inter: disnake.ApplicationCommandInteraction):
         """Flips a coin"""
         flip = random.randint(0, 6000)
@@ -52,7 +53,7 @@ class RandomCommands(commands.Cog):
         else:
             await inter.send(f"You flip a coin. It lands on **{'heads' if flip < 3000 else 'tails'}**.")
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def choose(self, inter: disnake.ApplicationCommandInteraction, choices: str):
         """Choose between a list of things
 
@@ -62,5 +63,5 @@ class RandomCommands(commands.Cog):
         """
         await inter.send(f"Picked **{random.choice(choices.split(';')).strip()}**.")
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(RandomCommands(bot))

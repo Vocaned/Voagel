@@ -3,20 +3,21 @@ from datetime import datetime
 
 import disnake
 import feedparser
-import lynn
-import utils
 from disnake.ext import commands
+from voagel.main import Bot
+from voagel.utils import OpenGraphParser, escape_url
 
 
 class NewsCommand(commands.Cog):
     """Google News"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     class NewsView(disnake.ui.View):
-        def __init__(self, feed):
+        def __init__(self, feed: dict, bot: Bot):
             self.feed = feed
+            self.bot = bot
             self.page = 0
             self.cache = {}
             super().__init__(timeout=30)
@@ -27,11 +28,11 @@ class NewsCommand(commands.Cog):
 
             entry = self.feed['items'][self.page]
 
-            article = await utils.rest(entry['link'], returns='text')
-            ogparser = utils.OpenGraphParser()
-            ogparser.feed(article)
+            ogparser = OpenGraphParser()
+            req = await self.bot.session.get(entry['link'])
+            ogparser.feed(await req.text())
 
-            if not ogparser.tags: # Article didn't have any OpenGraph meta tags. Probably blocked in EU.
+            if not ogparser.tags: # Article didn't have any OpenGraph meta tags.
                 del self.feed['items'][self.page] # Delete result and try the next one
                 return await self.get_embed()
 
@@ -67,10 +68,10 @@ class NewsCommand(commands.Cog):
                 self.page += 1
                 await inter.response.edit_message(embed=await self.get_embed())
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def news(self,
         inter: disnake.ApplicationCommandInteraction,
-        query: str = None
+        query: str = ''
     ):
         """
         Look up news using Google News. Defaults to world news
@@ -82,22 +83,22 @@ class NewsCommand(commands.Cog):
 
         await inter.response.defer()
         if query:
-            resp = await utils.rest(f'https://news.google.com/rss/search?q={utils.escape_url(query)}&hl=en-US&gl=US&ceid=US:en', returns='text')
+            req = await self.bot.session.get(f'https://news.google.com/rss/search?q={escape_url(query)}&hl=en-US&gl=US&ceid=US:en')
         else:
             # CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB = World News
-            resp = await utils.rest('https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en', returns='text')
+            req = await self.bot.session.get('https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en')
 
-        feed = feedparser.parse(resp)
+        feed = feedparser.parse(await req.text())
 
         if not feed['items']:
             raise Exception('Google News did not return any news for your query.')
 
-        view = self.NewsView(feed)
-        hook = await inter.followup.send(embed=await view.get_embed(), view=view)
+        view = self.NewsView(feed, self.bot)
+        hook = await inter.followup.send(embed=await view.get_embed(), view=view, wait=True)
         await view.wait()
         view.clear_items()
         await hook.edit(embed=await view.get_embed(), view=view) # Update one last time to remove the view buttons
 
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(NewsCommand(bot))
