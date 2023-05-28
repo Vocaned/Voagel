@@ -10,8 +10,13 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
+RUN pip install "poetry==1.4.2"
+
 COPY poetry.lock pyproject.toml /app
 RUN poetry config virtualenvs.create false && poetry install --no-dev --no-interaction --no-ansi
+
+# Get rid of git warnings
+RUN git config --global pull.rebase false
 
 # requires mounting src to /app
 CMD ["poetry", "run", "bot"]
