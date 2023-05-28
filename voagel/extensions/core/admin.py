@@ -44,7 +44,7 @@ class AdminCommands(commands.Cog):
         ----------
         module: Name of the module
         """
-        self.bot.load_extension('extensions.'+module)
+        self.bot.load_extension('voagel.extensions.'+module)
         await inter.send(f'Loaded {module}')
 
     @module.sub_command()
@@ -55,7 +55,7 @@ class AdminCommands(commands.Cog):
         ----------
         module: Name of the module
         """
-        self.bot.unload_extension('extensions.'+module)
+        self.bot.unload_extension('voagel.extensions.'+module)
         await inter.send(f'Unloaded {module}')
 
     @module.sub_command()
@@ -66,7 +66,7 @@ class AdminCommands(commands.Cog):
         ----------
         module: Name of the module
         """
-        self.bot.reload_extension('extensions.'+module)
+        self.bot.reload_extension('voagel.extensions.'+module)
         await inter.send(f'Reloaded {module}')
 
     @admin.sub_command_group()
