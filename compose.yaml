@@ -2,5 +2,5 @@ services:
   bot:
     build: .
     volumes:
-      - ./src:/app
+      - .:/app
     restart: unless-stopped
