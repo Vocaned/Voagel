@@ -34,7 +34,7 @@ class Bot(commands.InteractionBot):
         if not Path('config', 'bot.toml').exists():
             logging.critical('Bot config could not be found. Copy bot.toml to the config folder and edit it to continue.')
             sys.exit(1)
-        with open(Path('config', 'bot.toml'), 'rb', encoding='utf-8') as f:
+        with open(Path('config', 'bot.toml'), 'rb') as f:
             self.config = tomllib.load(f)
 
 def main() -> None:
@@ -48,5 +48,9 @@ def main() -> None:
             logging.error('Failed to load extension %s.', extension, exc_info=True)
 
     bot.status = disnake.Status(bot.config['bot']['status'])
-    bot.activity = disnake.Activity(name=bot.config['bot']['activity'], type=bot.config['bot']['activity_type'])
+
+    activities = {'unknown': -1, 'playing': 0, 'streaming': 1, 'listening': 2, 'watching': 3, 'custom': 4, 'competing': 5}
+    activitytype = activities.get(bot.config['bot']['activity_type'].lower(), 0)
+    bot.activity = disnake.Activity(name=bot.config['bot']['activity'], type=activitytype)
+
     bot.run(bot.get_api_key('discord'))
