@@ -1,13 +1,12 @@
 from typing import List
 
 import disnake
-import lynn
-import utils
 from disnake.ext import commands
 from pycountry import languages
+from voagel.main import Bot, EMBED_COLOR
+from voagel.utils import escape_url
 
-
-async def autocomplete(inter, string: str) -> List[str]:
+async def autocomplete(_, string: str) -> List[str]:
     langs = []
 
     for lang in languages:
@@ -22,20 +21,21 @@ async def autocomplete(inter, string: str) -> List[str]:
 class TranslateCommand(commands.Cog):
     """Translate"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     async def do_translate(self, fromlang: str, tolang: str, query: str):
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'}
-        data = await utils.rest(
-            f'https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&ie=UTF-8&oe=UTF-8&sl={fromlang}&tl={tolang}&q={utils.escape_url(query)}',
+        req = await self.bot.session.get(
+            f'https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&ie=UTF-8&oe=UTF-8&sl={fromlang}&tl={tolang}&q={escape_url(query)}',
             headers=headers
         )
+        data = await req.json()
         if not data:
             raise commands.CommandError('Did not get a response from Google. Probably an invalid language.')
         return data
 
-    @commands.message_command(name='Auto Translate', guild_ids=[702953546106273852])
+    @commands.message_command(name='Auto Translate')
     async def auto_translate(self, inter: disnake.MessageCommandInteraction):
         query = inter.target.content
         if not query:
@@ -59,14 +59,14 @@ class TranslateCommand(commands.Cog):
         else:
             outtext.append(data[0][0][0])
 
-        embed = disnake.Embed(title='Google Translate', color=lynn.EMBED_COLOR)
+        embed = disnake.Embed(title='Google Translate', color=EMBED_COLOR)
         if confidence:
             embed.set_footer(text=confidence)
         embed.add_field(f'From `{inlang}`', query, inline=False)
         embed.add_field('To `English`', ' '.join(outtext), inline=False)
         await inter.send(embed=embed)
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def translate(self,
         inter: disnake.ApplicationCommandInteraction,
         query: str,
@@ -126,10 +126,10 @@ class TranslateCommand(commands.Cog):
         else:
             outtext.append(data[0][0][0])
 
-        embed = disnake.Embed(title='Google Translate', description=confidence, color=lynn.EMBED_COLOR)
+        embed = disnake.Embed(title='Google Translate', description=confidence, color=EMBED_COLOR)
         embed.add_field(f'From `{inlang}`', query, inline=False)
         embed.add_field(f'To `{outlang}`', ' '.join(outtext), inline=False)
         await inter.send(embed=embed)
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(TranslateCommand(bot))

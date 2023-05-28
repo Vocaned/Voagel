@@ -1,11 +1,8 @@
 from datetime import datetime
-from enum import Enum
-from typing import List
 
 import disnake
-import lynn
-import utils
 from disnake.ext import commands
+from voagel.main import Bot
 
 statusPages = {
     # Unfortunately statuspage.io doesn't include system metrics in their API.
@@ -19,19 +16,20 @@ statusPages = {
     'GitHub': ('https://www.githubstatus.com', None),
     'Medium': ('https://medium.statuspage.io', ('kb1b7qv1kfv1', 'd9gjgw59bwfz', 'lwb7fbwqljjz')),
     'Epic Games': ('https://status.epicgames.com', None),
-    'Glitch': ('https://status.glitch.com', ('2hfs13clgy2x', 'lz9n5qdj9h67', '4kppgbgy1vg6', 'yfyd7k8t6c2t', 'f9m2jkbys0lt', '8hhlmmyf9fqw'))
+    'Glitch': ('https://status.glitch.com', ('2hfs13clgy2x', 'lz9n5qdj9h67', '4kppgbgy1vg6', 'yfyd7k8t6c2t', 'f9m2jkbys0lt', '8hhlmmyf9fqw')),
+    'OpenAI': ('https://status.openai.com', None)
 }
 
 class StatuspageComamnd(commands.Cog):
     """Statuspage Command"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def statuspage(self,
         inter: disnake.ApplicationCommandInteraction,
-        service: str = commands.Param(choices=statusPages.keys())
+        service: str = commands.Param(choices=list(statusPages.keys()))
     ):
         """Shows status pages of different services.
 
@@ -47,7 +45,8 @@ class StatuspageComamnd(commands.Cog):
         page = statusPages[service]
 
         col = 0x00
-        j = await utils.rest(page[0] + '/index.json', returns='json')
+        req = await self.bot.session.get(page[0])
+        j = await req.json()
         if j['status']['indicator'] == 'none':
             col = 0x00ff00
         elif j['status']['indicator'] == 'minor':
@@ -65,7 +64,8 @@ class StatuspageComamnd(commands.Cog):
             # Seperate component and metric statuses by using an invisible field
             embed.add_field('\U00002063', '\U00002063', inline=False)
             for metric in page[1]:
-                m = await utils.rest(f"{page[0]}/metrics-display/{metric}/day.json", returns='json')
+                req = await self.bot.session.get(f'{page[0]}/metrics-display/{metric}/day.json')
+                m = await req.json()
                 if not m or 'summary' not in m or 'last' not in m['summary']:
                     continue
                 last = m['summary']['last']
@@ -109,5 +109,5 @@ class StatuspageComamnd(commands.Cog):
         else:
             await inter.send(embeds=embeds[:10])
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(StatuspageComamnd(bot))

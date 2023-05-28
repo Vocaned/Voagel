@@ -2,13 +2,13 @@ import disnake
 from disnake.ext import commands
 import datetime
 
-import lynn
-import utils
+from voagel.main import Bot
+from voagel.utils import escape_url
 
 class WeatherCommand(commands.Cog):
     """Weather command"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     def get_embed_color(self, data: dict) -> int:
@@ -30,7 +30,7 @@ class WeatherCommand(commands.Cog):
 
         return 0xfefea0
 
-    @commands.slash_command(guild_ids=[702953546106273852])
+    @commands.slash_command()
     async def weather(self,
         inter: disnake.ApplicationCommandInteraction,
         location: str
@@ -45,11 +45,13 @@ class WeatherCommand(commands.Cog):
             raise Exception("You're supposed to enter a city. This isn't one.")
 
         await inter.response.defer()
-        geocoding = await utils.rest(f'https://nominatim.openstreetmap.org/search?format=json&limit=25&accept-language=en&q={utils.escape_url(location)}')
+        req = await self.bot.session.get(f'https://nominatim.openstreetmap.org/search?format=json&limit=25&accept-language=en&q={escape_url(location)}')
+        geocoding = await req.json()
         if not geocoding:
             raise Exception('Location not found.')
 
-        data = await utils.rest(f"https://api.weatherapi.com/v1/forecast.json?key={self.bot.get_api_key('weatherapi')}&q={geocoding[0]['lat']},{geocoding[0]['lon']}&aqi=yes&alerts=yes")
+        req = await self.bot.session.get(f"https://api.weatherapi.com/v1/forecast.json?key={self.bot.get_api_key('weatherapi')}&q={geocoding[0]['lat']},{geocoding[0]['lon']}&aqi=yes&alerts=yes")
+        data = await req.json()
 
         if not data or 'error' in data:
             if 'error' in data and 'message' in data['error']:
@@ -83,5 +85,5 @@ class WeatherCommand(commands.Cog):
 
         await inter.send(embed=embed)
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(WeatherCommand(bot))

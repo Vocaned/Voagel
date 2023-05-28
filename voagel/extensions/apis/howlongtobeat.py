@@ -1,12 +1,12 @@
 import disnake
 from disnake.ext import commands
-import lynn
 from howlongtobeatpy import HowLongToBeat
+from voagel.main import Bot, EMBED_COLOR
 
 class HowlongtobeatCommand(commands.Cog):
     """Howlongtobeat command"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.slash_command()
@@ -23,7 +23,7 @@ class HowlongtobeatCommand(commands.Cog):
         results = await HowLongToBeat().async_search(game)
         if results is not None and len(results) > 0:
             result = max(results, key=lambda element: element.similarity)
-            embed = disnake.Embed(title=f'How Long To Beat: {result.game_name}', url=result.game_web_link, color=lynn.EMBED_COLOR)
+            embed = disnake.Embed(title=f'How Long To Beat: {result.game_name}', url=result.game_web_link, color=EMBED_COLOR)
             embed.add_field('Main Story', f'{result.main_story} Hours')
             embed.add_field('Main + Extra', f'{result.main_extra} Hours')
             embed.add_field('Completionist', f'{result.completionist} Hours')
@@ -38,5 +38,5 @@ class HowlongtobeatCommand(commands.Cog):
 
 
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(HowlongtobeatCommand(bot))

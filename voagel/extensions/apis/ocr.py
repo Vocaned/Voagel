@@ -1,24 +1,22 @@
 import re
 
 import disnake
-import lynn
-import utils
 from disnake.ext import commands
+from voagel.main import Bot
 
 
 class OCRCommand(commands.Cog):
     """OCR"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     async def do_ocr(self, engine: int, link: str, lang=None) -> dict:
         data={'url': link, 'OCREngine': engine}
         if lang:
             data['language'] = lang
-        return await utils.rest('https://api.ocr.space/parse/image',
-            method='POST', headers={'apikey': self.bot.get_api_key('ocrspace')}, data=data
-        )
+        req = await self.bot.session.post('https://api.ocr.space/parse/image', data=data, headers={'apikey': self.bot.get_api_key('ocrspace')})
+        return await req.json()
 
     all_choices = [
         'English', 'Arabic', 'Bulgarian', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Croatian',
@@ -53,7 +51,7 @@ class OCRCommand(commands.Cog):
         'Turkish' : 'tur',
     }
 
-    @commands.message_command(name='Auto OCR', guild_ids=[702953546106273852])
+    @commands.message_command(name='Auto OCR')
     async def auto_ocr(self, inter: disnake.MessageCommandInteraction):
         """
         OCR.space V2 engine. Latin characters only. Max 5000x5000px!
@@ -64,6 +62,7 @@ class OCRCommand(commands.Cog):
             link = re.search(r'https?://\S+', inter.target.content)
             if not link:
                 raise Exception('Could not find an image in the specified message.')
+            link = link.group()
 
         await inter.response.defer()
         res = await self.do_ocr(2, link)
@@ -74,22 +73,32 @@ class OCRCommand(commands.Cog):
         else:
             await inter.send(f"```{res['ParsedResults'][0]['ParsedText']} ```")
 
-    @commands.slash_command(name='ocr', guild_ids=[702953546106273852])
+    @commands.slash_command(name='ocr')
     async def ocr_v2(self,
         inter: disnake.ApplicationCommandInteraction,
-        link: str, # TODO: Make optional once image uploading on slash commands becomes available
-        language: str = commands.Param(None, choices=latin_choices)
+        language: str = commands.Param(None, choices=latin_choices), # type: ignore # TODO: fix typing
+        attachment: disnake.Attachment | None = None,
+        link: str | None = None
     ):
         """
         OCR.space V2 engine. Latin characters only. Max 5000x5000px!
 
         Parameters
         ----------
-        link: Link to image
         language: Manual language selection
+        link: Link to image
+        attachment: Image
         """
         if language:
             language = self.lang_map[language]
+
+        if attachment:
+            if link:
+                raise Exception('Both attachment and link provided. Please only enter one')
+            link = attachment.url
+
+        if not link:
+            raise Exception('No link or attachment provided')
 
         await inter.response.defer()
         res = await self.do_ocr(2, link, language)
@@ -100,22 +109,32 @@ class OCRCommand(commands.Cog):
         else:
             await inter.send(f"```{res['ParsedResults'][0]['ParsedText']} ```")
 
-    @commands.slash_command(name='ocrv3', guild_ids=[702953546106273852])
+    @commands.slash_command(name='ocrv3')
     async def ocr_v3(self,
         inter: disnake.ApplicationCommandInteraction,
-        link: str, # TODO: Make optional once image uploading on slash commands becomes available
-        language: str = commands.Param(choices=all_choices)
+        language: str = commands.Param(None, choices=all_choices), # type: ignore # TODO: fix typing
+        attachment: disnake.Attachment | None = None,
+        link: str | None = None
     ):
         """
         OCR.space V3 engine. Good Asian script support. Max 1000x1000px!
 
         Parameters
         ----------
-        link: Link to image
         language: Manual language selection
+        link: Link to image
+        attachment: Image
         """
         if language:
             language = self.lang_map[language]
+
+        if attachment:
+            if link:
+                raise Exception('Both attachment and link provided. Please only enter one')
+            link = attachment.url
+
+        if not link:
+            raise Exception('No link or attachment provided')
 
         await inter.response.defer()
         res = await self.do_ocr(3, link, language)
@@ -127,5 +146,5 @@ class OCRCommand(commands.Cog):
             await inter.send(f"```{res['ParsedResults'][0]['ParsedText']} ```")
 
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(OCRCommand(bot))

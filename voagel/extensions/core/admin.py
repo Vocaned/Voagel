@@ -1,14 +1,15 @@
 import disnake
 from disnake.ext import commands
-import lynn
 import os
-import utils
+from voagel.main import Bot
+from voagel.utils import check_output
+
 
 
 class AdminCommands(commands.Cog):
     """Admin commands"""
 
-    def __init__(self, bot: lynn.Bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
 
     @commands.slash_command()
@@ -77,14 +78,14 @@ class AdminCommands(commands.Cog):
     async def pull(self, inter: disnake.ApplicationCommandInteraction):
         """Pull the git repo"""
         await inter.response.defer()
-        out1 = await utils.check_output(['git', 'pull'], timeout=30)
-        out2 = await utils.check_output(['git', 'log', '@{1}..', '--format=%h %an | %B'], timeout=30)
+        out1 = await check_output(['git', 'pull'], timeout=30)
+        out2 = await check_output(['git', 'log', '@{1}..', '--format=%h %an | %B'], timeout=30)
         await inter.send(f'```{out1}\n\n{out2}```')
 
     @git.sub_command()
     async def fuck(self, inter: disnake.ApplicationCommandInteraction):
         """Did you fuck up the files again?"""
-        await inter.send(f'```{await utils.check_output(["git", "reset", "--hard", "origin/master"])}```')
+        await inter.send(f'```{await check_output(["git", "reset", "--hard", "origin/master"])}```')
 
-def setup(bot: lynn.Bot):
+def setup(bot: Bot):
     bot.add_cog(AdminCommands(bot))
