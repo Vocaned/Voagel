@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "voagel"
+version = "0.0.1"
+description = ""
+authors = ["Fam0r <fam0r@mailbox.org>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+disnake = "^2.8.1"
+yt-dlp = "^2023.3.4"
+howlongtobeatpy = "^1.0.5"
+feedparser = "^6.0.10"
+pycountry = "^22.3.5"
+mmh3 = "^4.0.0"
+
+[tool.poetry.scripts]
+bot = "voagel.main:main"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
