@@ -1,9 +1,7 @@
 import typing
 import urllib.parse
-import aiohttp
 import asyncio
 import os
-import logging
 import html.parser
 from datetime import timedelta
 
@@ -59,7 +57,7 @@ class OpenGraphParser(html.parser.HTMLParser):
             return
         k = v = None
         for attr in attrs:
-            if attr[0].lower() == 'name' or attr[0].lower() == 'property' and attr[1].startswith('og:'):
+            if attr[0].lower() == 'name' or attr[0].lower() == 'property' and attr[1] and attr[1].startswith('og:'):
                 k = attr[1]
             if attr[0].lower() == 'content':
                 v = attr[1]
