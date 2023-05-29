@@ -17,7 +17,7 @@ RUN poetry config virtualenvs.create false && poetry install --no-interaction --
 
 # Get rid of git warnings
 RUN git config --global pull.rebase false
-RUN git config --global --add safe.directory /app
+RUN git config --global safe.directory '*'
 
 # requires mounting src to /app
 CMD ["poetry", "run", "bot"]
