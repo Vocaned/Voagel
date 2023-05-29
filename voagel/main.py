@@ -37,7 +37,7 @@ class Bot(commands.InteractionBot):
             self.config = tomllib.load(f)
 
 def main() -> None:
-    bot = Bot(intents=disnake.Intents.default())
+    bot = Bot(intents=disnake.Intents.all())
     bot.load_config()
 
     # TODO: clean up this mess
