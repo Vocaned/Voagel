@@ -57,8 +57,8 @@ class EmojiCommand(commands.Cog):
 
         req = requests.get(link, timeout=10)
 
-        static = []
-        animated = []
+        static: list[tuple[str, bytes]] = []
+        animated: list[tuple[str, bytes]] = []
 
         formats = [
             'png',
@@ -85,6 +85,7 @@ class EmojiCommand(commands.Cog):
             return
             
         for emoji in static:
+            print(emoji[0])
             await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
         for emoji in animated:
             await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
