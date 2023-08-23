@@ -69,7 +69,7 @@ class EmojiCommand(commands.Cog):
 
         with zipfile.ZipFile(BytesIO(req.content), 'r') as fz:
             for file in fz.infolist():
-                if file.filename.rsplit('.', 1)[1].lower() not in ['gif', *formats]:
+                if '.' not in file.filename or file.filename.rsplit('.', 1)[1].lower() not in ['gif', *formats]:
                     continue
                 with fz.open(file.filename) as f:
                     if file.filename.rsplit('.', 1)[1].lower() == 'gif':
