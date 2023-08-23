@@ -73,9 +73,9 @@ class EmojiCommand(commands.Cog):
                     continue
                 with fz.open(file.filename) as f:
                     if file.filename.rsplit('.', 1)[1].lower() == 'gif':
-                        animated.append((file.filename.rsplit('.', 1)[0].rsplit('/', 1)[0], f.read()))
+                        animated.append((file.filename.rsplit('.', 1)[0].rsplit('/', 1)[1], f.read()))
                     else:
-                        static.append((file.filename.rsplit('.', 1)[0].rsplit('/', 1)[0], f.read()))
+                        static.append((file.filename.rsplit('.', 1)[0].rsplit('/', 1)[1], f.read()))
 
         current_emojis = await inter.guild.fetch_emojis()
         current_static = [e for e in current_emojis if e.animated]
