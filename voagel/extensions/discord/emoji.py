@@ -67,7 +67,7 @@ class EmojiCommand(commands.Cog):
             'webp'
         ]
 
-        with zipfile.ZipFile(BytesIO(req.content()), 'r') as fz:
+        with zipfile.ZipFile(BytesIO(req.content), 'r') as fz:
             for file in fz.infolist():
                 if file.filename.rsplit('.', 1)[1].lower() not in ['gif', *formats]:
                     continue
