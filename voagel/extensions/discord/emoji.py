@@ -77,7 +77,19 @@ class EmojiCommand(commands.Cog):
                     else:
                         static.append((file.filename.rsplit('.', 1)[0], f.read()))
 
-        await inter.send(f'Found {len(static)} static and {len(animated)} animated emotes.')
+        current_emojis = await inter.guild.fetch_emojis()
+        current_static = [e for e in current_emojis if e.animated]
+        current_animated = [e for e in current_emojis if not e.animated]
+        if len(static) > 100 or len(animated) > 100 or len(static) + len(current_static) > 100 or len(animated) + len(current_animated) > 100:
+            await inter.send(f'Found {len(static)} static and {len(animated)} animated emotes in zip.\nServer cannot fit more than {100-len(current_static)} static and {100-len(current_animated)} animated emotes.')
+            return
+
+        for emoji in static:
+            await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
+        for emoji in animated:
+            await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
+
+        await inter.send(f'Added {len(static)} static and {len(animated)} animated emotes.')
 
 def setup(bot: Bot):
     bot.add_cog(EmojiCommand(bot))
