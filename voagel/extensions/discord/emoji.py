@@ -1,6 +1,5 @@
 from typing import Optional
 import zipfile
-import logging
 from io import BytesIO
 import requests
 import disnake
@@ -74,9 +73,9 @@ class EmojiCommand(commands.Cog):
                     continue
                 with fz.open(file.filename) as f:
                     if file.filename.rsplit('.', 1)[1].lower() == 'gif':
-                        animated.append((file.filename.rsplit('.', 1)[0], f.read()))
+                        animated.append((file.filename.rsplit('.', 1)[0].rsplit('/', 1)[0], f.read()))
                     else:
-                        static.append((file.filename.rsplit('.', 1)[0], f.read()))
+                        static.append((file.filename.rsplit('.', 1)[0].rsplit('/', 1)[0], f.read()))
 
         current_emojis = await inter.guild.fetch_emojis()
         current_static = [e for e in current_emojis if e.animated]
@@ -84,9 +83,8 @@ class EmojiCommand(commands.Cog):
         if len(static) > inter.guild.emoji_limit or len(animated) > inter.guild.emoji_limit or len(static) + len(current_static) > inter.guild.emoji_limit or len(animated) + len(current_animated) > inter.guild.emoji_limit:
             await inter.send(f'Found {len(static)} static and {len(animated)} animated emotes in zip.\nServer cannot fit more than {inter.guild.emoji_limit-len(current_static)} static and {inter.guild.emoji_limit-len(current_animated)} animated emotes.')
             return
-            
+
         for emoji in static:
-            logging.warn(emoji[0])
             await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
         for emoji in animated:
             await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
