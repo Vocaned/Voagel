@@ -1,5 +1,6 @@
 from typing import Optional
 import zipfile
+import logging
 from io import BytesIO
 import requests
 import disnake
@@ -85,7 +86,7 @@ class EmojiCommand(commands.Cog):
             return
             
         for emoji in static:
-            print(emoji[0])
+            logging.warn(emoji[0])
             await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
         for emoji in animated:
             await inter.guild.create_custom_emoji(name=emoji[0], image=emoji[1], reason=f'Mass-uploaded by {inter.author.name}')
