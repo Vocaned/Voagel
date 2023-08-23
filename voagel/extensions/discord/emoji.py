@@ -24,7 +24,7 @@ class EmojiCommand(commands.Cog):
 
         emojis = await inter.guild.fetch_emojis()
         for emoji in emojis:
-            await inter.guild.delete_emoji()
+            await inter.guild.delete_emoji(emoji.id)
 
         await inter.send(f'Removed {len(emojis)} emojis')
 
