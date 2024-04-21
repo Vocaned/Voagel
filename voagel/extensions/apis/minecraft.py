@@ -67,18 +67,18 @@ class MinecraftCommands(commands.Cog):
         'reset': '\033[0m',
     }
 
-    async def get_UUID(self, name: str) -> str:
+    async def get_UUID(self, name: str) -> (str, str):
         req = await self.bot.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}')
         if req.status == 200:
             j = json.loads(await req.text())
             if 'id' in j:
-                return j['id']
+                return (j["name"], j['id'])
 
         req = await self.bot.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}?at=0')
         if req.status == 200:
             j = json.loads(await req.text())
             if 'id' in j:
-                return j['id']
+                return (j["name"], j['id'])
 
         raise Exception('Player not found')
 
@@ -181,27 +181,17 @@ class MinecraftCommands(commands.Cog):
         """
         await inter.response.defer()
 
-        uuid = await self.get_UUID(username)
+        user, uuid = await self.get_UUID(username)
         skin = await self.get_skin(uuid)
-        req = await self.bot.session.get(f'https://api.mojang.com/user/profiles/{uuid}/names')
-        history = await req.json()
-
-        names = []
-        user = history[-1]['name']
-        for entry in history:
-            # Escape special markdown characters
-            names.append(entry['name'].replace('*', '\\*').replace('_', '\\_').replace('~', '\\~'))
-        names.reverse()
-        names[0] += ' **[CURRENT]**'
 
         embeds = []
-        embed = disnake.Embed(title='Minecraft Player', color=EMBED_COLOR)
+        embed = disnake.Embed(color=EMBED_COLOR)
         embed.set_author(name=user, icon_url=f'https://crafatar.com/avatars/{uuid}.png')
-        embed.add_field('Name History', '\n'.join(names), inline=False)
-        embed.set_footer(text=f'UUID: {uuid}', icon_url='https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-96x96.png')
+        embed.set_footer(text=f'Minecraft', icon_url=self.bot.get_asset('minecraft.png'))
         embed.timestamp = datetime.now()
         embed.set_image(url=f'https://crafatar.com/renders/body/{uuid}.png')
 
+        embed.add_field(name='UUID', value=uuid)
         try:
             embed.add_field(name='Skin URL', value='[Click me]('+skin['textures']['SKIN']['url']+')')
         except KeyError:
@@ -274,13 +264,13 @@ class MinecraftCommands(commands.Cog):
         embed = disnake.Embed(color=EMBED_COLOR)
         embed.timestamp = datetime.utcnow()
         embed.title = ip + (f':{port}' if port != 25565 else '')
-        embed.set_footer(text='.', icon_url='https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon-96x96.png')
+        embed.set_footer(text='Minecraft', icon_url=self.bot.get_asset('minecraft.png'))
 
         if 'favicon' in data and data['favicon']:
             favicon = disnake.File(BytesIO(base64.b64decode(data['favicon'].replace('data:image/png;base64,', ''))), 'pack.png')
             embed.set_thumbnail(file=favicon)
         else:
-            embed.set_thumbnail(url='https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/78/Pack_64x64.png')
+            embed.set_thumbnail(url=self.bot.get_asset('mc_server.png'))
 
         if isinstance(data['description'], dict):
             # json text format

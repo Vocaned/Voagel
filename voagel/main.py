@@ -14,11 +14,10 @@ class Bot(commands.InteractionBot):
         self.config = {}
         self.data = {}
 
-        self.session = aiohttp.ClientSession(headers={'User-Agent': 'Voagel (Discord Bot) https://github.com/Fam0r/Voagel'})
-
         super().__init__(*args, **kwargs)
 
     async def on_ready(self):
+        self.session = aiohttp.ClientSession(headers={'User-Agent': 'Voagel (Discord Bot) https://github.com/Fam0r/Voagel'})
         logging.info("Bot is ready.")
 
     def get_api_key(self, key: str) -> str:
@@ -26,6 +25,9 @@ class Bot(commands.InteractionBot):
         if not val:
             raise commands.DisabledCommand('API key for command missing. Ping the bot owner for help.')
         return val
+
+    def get_asset(self, path: str) -> str:
+        return self.config['misc']['asset_url'] + path
 
     def load_config(self):
         Path('config').mkdir(exist_ok=True)
@@ -54,3 +56,13 @@ def main() -> None:
     bot.activity = disnake.Activity(name=bot.config['bot']['activity'], type=activitytype)
 
     bot.run(bot.get_api_key('discord'))
+
+if __name__ == '__main__':
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    logger.addHandler(ch)
+
+    main()

@@ -55,24 +55,5 @@ class ModCommands(commands.Cog):
 
         await inter.send(f'Deleted {len(deleted)} messages.', ephemeral=True)
 
-    @commands.slash_command(name='nick')
-    @commands.guild_only()
-    @commands.bot_has_permissions(manage_nicknames=True)
-    @commands.default_member_permissions(manage_nicknames=True)
-    async def nick(self,
-        inter: disnake.ApplicationCommandInteraction,
-        user: disnake.Member,
-        nick: str
-    ):
-        """Change an another user's nickname
-
-        Parameters
-        ----------
-        user: User whose nickname to change
-        nick: New nickname
-        """
-        await user.edit(nick=nick)
-        await inter.send(f"{user.mention}'s nickname changed to `{nick}`", ephemeral=True)
-
 def setup(bot: Bot):
     bot.add_cog(ModCommands(bot))

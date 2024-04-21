@@ -1,10 +1,13 @@
 [secrets] # Fill in Discord Token and API keys from different sites
 discord = "TOKEN"
-ocrspace = ""
 wolframalpha = ""
 weatherapi = ""
+gcp_ocr = ""
 
 [bot]
 status = "online" # online/idle/dnd/offline
 activity_type = "playing" # playing/listening/watching/competing
 activity = ""
+
+[misc]
+asset_url = "https://raw.githubusercontent.com/Vocaned/Voagel/master/assets/"

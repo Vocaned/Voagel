@@ -1,7 +1,7 @@
 import disnake
 from disnake.ext import commands
 from datetime import datetime
-from voagel.main import Bot
+from voagel.main import EMBED_COLOR, Bot
 from voagel.utils import escape_url, timedelta_format
 
 class ClassicubeCommand(commands.Cog):
@@ -11,10 +11,10 @@ class ClassicubeCommand(commands.Cog):
         self.bot = bot
 
     FLAGS = {
-        'b': 'Banned from forums',
+        'b': 'Banned from legacy forums',
         'd': 'Developer',
-        'm': 'Forum moderator',
-        'a': 'Forum admin',
+        'm': 'Legacy forum moderator',
+        'a': 'Legacy forum admin',
         'e': 'Blog editor',
         'p': 'Patron',
         'u': 'Unverified',
@@ -45,10 +45,10 @@ class ClassicubeCommand(commands.Cog):
             raise Exception(data['error'] if data and data['error'] else 'User not found')
 
         flags = data['flags']
-        embed = disnake.Embed(title='ClassiCube User', colour=0x977dab)
-        embed.set_footer(text=f'ID: {data["id"]}', icon_url='https://www.classicube.net/static/img/cc-cube-small.png')
-        embed.timestamp = datetime.utcnow()
-        delta = datetime.utcnow() - datetime.utcfromtimestamp(data['registered'])
+        embed = disnake.Embed(title='ClassiCube User', colour=EMBED_COLOR)
+        embed.set_footer(text=f'Classicube • ID: {data["id"]}', icon_url=self.bot.get_asset('cc-cube.png'))
+        embed.timestamp = datetime.now()
+        delta = datetime.now() - datetime.fromtimestamp(data['registered'])
 
         embed.set_image(url='https://123dmwm.com/img/3d.php?user='+data['username'])
         embed.set_author(name=data['username'], icon_url=f'https://classicube.s3.amazonaws.com/face/{data["username"]}.png')
@@ -57,7 +57,7 @@ class ClassicubeCommand(commands.Cog):
         if flags:
             embed.add_field(name='Notes', value=', '.join([self.FLAGS[n] for n in flags]))
         if data['forum_title']:
-            embed.add_field(name='Forum Title', value=data['forum_title'])
+            embed.add_field(name='Legacy forum Title', value=data['forum_title'])
 
         await inter.send(embed=embed)
 

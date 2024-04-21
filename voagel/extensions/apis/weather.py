@@ -2,7 +2,7 @@ import disnake
 from disnake.ext import commands
 import datetime
 
-from voagel.main import Bot
+from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import escape_url
 
 class WeatherCommand(commands.Cog):
@@ -28,7 +28,7 @@ class WeatherCommand(commands.Cog):
         if len(data['alerts']['alert']) > 0:
             return 0xfa9090
 
-        return 0xfefea0
+        return EMBED_COLOR
 
     @commands.slash_command()
     async def weather(self,
@@ -80,7 +80,7 @@ class WeatherCommand(commands.Cog):
 
 
         embed.colour = self.get_embed_color(data)
-        embed.set_footer(text='Powered by WeatherAPI.com and OpenStreetMap')
+        embed.set_footer(text='Powered by WeatherAPI.com and OpenStreetMap') # TODO: Missing icon
         embed.timestamp = datetime.datetime.fromtimestamp(data['current']['last_updated_epoch'], tz=datetime.timezone.utc)
 
         await inter.send(embed=embed)

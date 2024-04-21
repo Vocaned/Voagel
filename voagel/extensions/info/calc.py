@@ -5,7 +5,7 @@ import re
 import disnake
 from disnake.ext import commands
 
-from voagel.main import Bot
+from voagel.main import Bot, EMBED_COLOR
 
 """calclib - Stuff used by calc"""
 
@@ -333,7 +333,12 @@ class CalculatorCommand(commands.Cog):
         expr = implicit_multiplication(expr)
         expr = to_rpn(expr)
         expr = eval_rpn(expr)
-        await inter.send(f'> `{orig_expr} = {expr}`')
+
+        embed = disnake.Embed()
+        embed.set_author(name=orig_expr)
+        embed.description = f'> {expr}'
+
+        await inter.send(embed=embed)
 
 def setup(bot: Bot):
     bot.add_cog(CalculatorCommand(bot))

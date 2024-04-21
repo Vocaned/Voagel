@@ -1,22 +1,10 @@
-from typing import List
-
 import disnake
 from disnake.ext import commands
 from pycountry import languages
+
 from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import escape_url
-
-async def autocomplete(_, string: str) -> List[str]:
-    langs = []
-
-    for lang in languages:
-        try:
-            if string.lower() in lang.name.lower() and lang.alpha_2:
-                langs.append(lang.name)
-        except Exception:
-            pass
-
-    return langs[:25]
+from voagel.autocompleters import language_autocomplete
 
 class TranslateCommand(commands.Cog):
     """Translate"""
@@ -59,19 +47,20 @@ class TranslateCommand(commands.Cog):
         else:
             outtext.append(data[0][0][0])
 
-        embed = disnake.Embed(title='Google Translate', color=EMBED_COLOR)
+        embed = disnake.Embed(color=EMBED_COLOR)
         if confidence:
             embed.set_footer(text=confidence)
         embed.add_field(f'From `{inlang}`', query, inline=False)
         embed.add_field('To `English`', ' '.join(outtext), inline=False)
+        embed.set_footer(text='Google Translate', icon_url=self.bot.get_asset('google_translate.png'))
         await inter.send(embed=embed)
 
     @commands.slash_command()
     async def translate(self,
         inter: disnake.ApplicationCommandInteraction,
         query: str,
-        _from: str = commands.Param('auto', name='from', autocomplete=autocomplete),
-        to: str = commands.Param('eng', autocomplete=autocomplete)
+        _from: str = commands.Param('auto', name='from', autocomplete=language_autocomplete),
+        to: str = commands.Param('eng', autocomplete=language_autocomplete)
     ):
         """
         Translate stuff using Google Translate. Defaults to Auto-Detect -> English
@@ -126,9 +115,10 @@ class TranslateCommand(commands.Cog):
         else:
             outtext.append(data[0][0][0])
 
-        embed = disnake.Embed(title='Google Translate', description=confidence, color=EMBED_COLOR)
+        embed = disnake.Embed(description=confidence, color=EMBED_COLOR)
         embed.add_field(f'From `{inlang}`', query, inline=False)
         embed.add_field(f'To `{outlang}`', ' '.join(outtext), inline=False)
+        embed.set_footer(text='Google Translate', icon_url=self.bot.get_asset('google_translate.png'))
         await inter.send(embed=embed)
 
 def setup(bot: Bot):

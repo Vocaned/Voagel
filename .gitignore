@@ -4,3 +4,5 @@ data
 dist
 .venv
 voagel/extensions/secret
+build
+*.egg-info

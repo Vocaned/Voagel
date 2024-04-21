@@ -1,25 +1,25 @@
-[tool.poetry]
+[build-system]
+requires = [
+    "packaging",
+    "setuptools",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "voagel"
 version = "0.0.1"
 description = ""
-authors = ["Fam0r <fam0r@mailbox.org>"]
-readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "yt-dlp",
+    "disnake >= 2.9.1",
+    "howlongtobeatpy >= 1.0.5",
+    "feedparser >= 6.0.11",
+    "pycountry >= 23.12.11",
+    "mmh3 >= 4.1.0"
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-disnake = "^2.8.1"
-yt-dlp = "^2023.11.14"
-howlongtobeatpy = "^1.0.5"
-feedparser = "^6.0.10"
-pycountry = "^22.3.5"
-mmh3 = "^4.0.0"
-
-[tool.poetry.scripts]
-bot = "voagel.main:main"
-
-[tool.poetry.group.dev.dependencies]
-pylint = "^2.17.5"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["voagel"]

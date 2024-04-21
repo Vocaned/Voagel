@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, UTC
 
 import disnake
 from disnake.ext import commands
-from voagel.main import Bot
+from voagel.main import Bot, EMBED_COLOR
 
 statusPages = {
     # Unfortunately statuspage.io doesn't include system metrics in their API.
@@ -17,7 +17,9 @@ statusPages = {
     'Medium': ('https://medium.statuspage.io', ('kb1b7qv1kfv1', 'd9gjgw59bwfz', 'lwb7fbwqljjz')),
     'Epic Games': ('https://status.epicgames.com', None),
     'Glitch': ('https://status.glitch.com', ('2hfs13clgy2x', 'lz9n5qdj9h67', '4kppgbgy1vg6', 'yfyd7k8t6c2t', 'f9m2jkbys0lt', '8hhlmmyf9fqw')),
-    'OpenAI': ('https://status.openai.com', None)
+    'OpenAI': ('https://status.openai.com', None),
+    'Proton': ('https://status.proton.me', None),
+    'Akamai': ('https://www.akamaistatus.com', None)
 }
 
 class StatuspageComamnd(commands.Cog):
@@ -44,19 +46,17 @@ class StatuspageComamnd(commands.Cog):
 
         page = statusPages[service]
 
-        col = 0x00
+        col = EMBED_COLOR
         req = await self.bot.session.get(page[0])
         j = await req.json()
-        if j['status']['indicator'] == 'none':
-            col = 0x00ff00
-        elif j['status']['indicator'] == 'minor':
+        if j['status']['indicator'] == 'minor':
             col = 0xffa500
         elif j['status']['indicator'] == 'major':
             col = 0xff0000
 
         embeds = []
         embed = disnake.Embed(title=f"**{service} Status** - {j['status']['description']}", colour=col, url=page[0])
-        embed.timestamp = datetime.utcnow()
+        embed.timestamp = datetime.now(UTC)
         for comp in j['components']:
             embed.add_field(comp['name'], comp['status'].replace('_', ' ').title())
 

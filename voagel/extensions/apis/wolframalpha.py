@@ -3,7 +3,7 @@ from io import BytesIO
 import disnake
 from disnake.ext import commands
 
-from voagel.main import Bot
+from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import escape_url
 
 
@@ -44,8 +44,10 @@ class WolframAlphaCommand(commands.Cog):
         if len(data) == 0:
             raise Exception('WolframAlpha did not return any data.')
 
-        file = disnake.File(BytesIO(data), 'wolfram.png')
-        await inter.send(file=file)
+        embed = disnake.Embed(color=EMBED_COLOR)
+        embed.set_image(disnake.File(BytesIO(data), 'wolfram.png'))
+        embed.set_footer(text='Wolfram Alpha', icon_url=self.bot.get_asset('wolfram.png'))
+        await inter.send(embed=embed)
 
 
 def setup(bot: Bot):
