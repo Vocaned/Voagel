@@ -10,14 +10,12 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
-RUN pip install "poetry==1.4.2"
-
-COPY poetry.lock pyproject.toml /app
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --only main
+COPY pyproject.toml /app
+RUN pip install -U .
 
 # Get rid of git warnings
 RUN git config --global pull.rebase false
 RUN git config --global safe.directory '*'
 
 # requires mounting src to /app
-CMD ["poetry", "run", "bot"]
+CMD ["python", "/app/main/voagel.py"]

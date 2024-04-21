@@ -21,15 +21,10 @@ class AdminCommands(commands.Cog):
     @admin.sub_command()
     async def debug(self, inter: disnake.ApplicationCommandInteraction):
         """Show the latest error log"""
-        if not os.path.exists('data/error.dat'):
+        if not 'last_error' in self.bot.data:
             await inter.send('No errors logged.', ephemeral=True)
 
-        with open('data/error.dat', 'r', encoding='utf-8') as errors:
-            error = errors.read()
-            if not error:
-                await inter.send('No errors logged.', ephemeral=True)
-            else:
-                await inter.send(f'```{error[-1990:]}```', ephemeral=True) # Tail 1990 chars
+        await inter.send(f'```{self.bot.data["last_error"][-1990:]}```', ephemeral=True) # Tail 1990 chars
 
     @admin.sub_command_group()
     async def module(self, _: disnake.ApplicationCommandInteraction):

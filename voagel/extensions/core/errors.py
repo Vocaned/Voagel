@@ -34,11 +34,7 @@ class Errors(commands.Cog):
             return
 
         logging.warning('Ignoring exception in /%s', inter.application_command.name)
-        try:
-            with open('data/error.dat', 'w', encoding='utf-8') as f:
-                f.write('\n'.join(traceback.format_exception(type(error), error, error.__traceback__)))
-        except:
-            logging.error('ERROR: Could not write error to error.dat')
+        self.bot.data['last_error'] = '\n'.join(traceback.format_exception(type(error), error, error.__traceback__))
 
         errtype = None
         errmsg = None

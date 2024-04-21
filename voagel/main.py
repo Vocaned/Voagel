@@ -17,7 +17,7 @@ class Bot(commands.InteractionBot):
         super().__init__(*args, **kwargs)
 
     async def on_ready(self):
-        self.session = aiohttp.ClientSession(headers={'User-Agent': 'Voagel (Discord Bot) https://github.com/Fam0r/Voagel'})
+        self.session = aiohttp.ClientSession(headers={'User-Agent': 'Voagel (Discord Bot) https://github.com/Vocaned/Voagel'})
         logging.info("Bot is ready.")
 
     def get_api_key(self, key: str) -> str:
@@ -31,7 +31,6 @@ class Bot(commands.InteractionBot):
 
     def load_config(self):
         Path('config').mkdir(exist_ok=True)
-        Path('data').mkdir(exist_ok=True)
         if not Path('config', 'bot.toml').exists():
             logging.critical('Bot config could not be found. Copy bot.toml to the config folder and edit it to continue.')
             sys.exit(1)
