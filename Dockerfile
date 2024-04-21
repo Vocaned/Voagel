@@ -18,4 +18,4 @@ RUN git config --global pull.rebase false
 RUN git config --global safe.directory '*'
 
 # requires mounting src to /app
-CMD ["python", "/app/main/voagel.py"]
+CMD ["python", "/app/voagel/main.py"]
