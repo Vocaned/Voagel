@@ -10,12 +10,13 @@ RUN set -eux; \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml /app
-RUN pip install -U .
+COPY requirements.txt /app
+RUN pip install -r requirements.txt
 
 # Get rid of git warnings
 RUN git config --global pull.rebase false
 RUN git config --global safe.directory '*'
 
 # requires mounting src to /app
-CMD ["python", "/app/voagel/main.py"]
+CMD ["python", "-m", "voagel.main"]
+

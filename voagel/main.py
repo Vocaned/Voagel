@@ -1,6 +1,7 @@
 import logging
 import disnake
 import sys
+import os
 import tomllib
 import aiohttp
 from pathlib import Path
@@ -57,11 +58,4 @@ def main() -> None:
     bot.run(bot.get_api_key('discord'))
 
 if __name__ == '__main__':
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    logger.addHandler(ch)
-
     main()
