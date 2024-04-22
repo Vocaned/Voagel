@@ -1,5 +1,6 @@
 import re
 import base64
+from io import BytesIO
 
 import disnake
 from disnake.ext import commands
@@ -12,13 +13,10 @@ class OCRCommand(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def do_ocr(self, link: str) -> dict:
-        # Fetch image
-        img = await self.bot.session.get(link)
-
+    async def do_ocr(self, img: bytes) -> dict:
         data={'requests': [{
             'features': [{'type': 'TEXT_DETECTION'}],
-            'image': {'content': base64.b64encode(await img.read()).decode()}
+            'image': {'content': base64.b64encode(img).decode()}
         }]}
         req = await self.bot.session.post(f'https://content-vision.googleapis.com/v1/images:annotate?key={self.bot.get_api_key("gcp_ocr")}', json=data)
         j = await req.json()
@@ -43,13 +41,16 @@ class OCRCommand(commands.Cog):
             link = link.group()
 
         await inter.response.defer()
-        res = await self.do_ocr(link)
+        imgres = await self.bot.session.get(link)
+        img = await imgres.read()
+        res = await self.do_ocr(img)
         if not res['fullTextAnnotation']:
             raise Exception('Did not detect text.')
         else:
             embed = disnake.Embed(color=EMBED_COLOR)
             embed.set_footer(text='Google Cloud Vision', icon_url=self.bot.get_asset('gcp.png'))
             embed.description = f'```\n{res["fullTextAnnotation"]["text"]}\n```'
+            embed.set_thumbnail(disnake.File(BytesIO(img)))
             await inter.send(embed=embed)
 
     @commands.slash_command(name='ocr')
@@ -76,13 +77,16 @@ class OCRCommand(commands.Cog):
             raise Exception('No link or attachment provided')
 
         await inter.response.defer()
-        res = await self.do_ocr(link)
+        imgres = await self.bot.session.get(link)
+        img = await imgres.read()
+        res = await self.do_ocr(img)
         if not res['fullTextAnnotation']:
             raise Exception('Did not detect text.')
         else:
             embed = disnake.Embed(color=EMBED_COLOR)
             embed.set_footer(text='Google Cloud Vision', icon_url=self.bot.get_asset('gcp.png'))
             embed.description = f'```\n{res["fullTextAnnotation"]["text"]}\n```'
+            embed.set_thumbnail(disnake.File(BytesIO(img)))
             await inter.send(embed=embed)
 
 def setup(bot: Bot):
