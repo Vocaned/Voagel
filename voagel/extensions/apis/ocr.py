@@ -50,7 +50,7 @@ class OCRCommand(commands.Cog):
             embed = disnake.Embed(color=EMBED_COLOR)
             embed.set_footer(text='Google Cloud Vision', icon_url=self.bot.get_asset('gcp.png'))
             embed.description = f'```\n{res["fullTextAnnotation"]["text"]}\n```'
-            embed.set_thumbnail(file=disnake.File(BytesIO(img)))
+            embed.set_thumbnail(file=disnake.File(fp=BytesIO(img), filename=link.split('/')[-1].split('?')[0]))
             await inter.send(embed=embed)
 
     @commands.slash_command(name='ocr')
@@ -86,7 +86,7 @@ class OCRCommand(commands.Cog):
             embed = disnake.Embed(color=EMBED_COLOR)
             embed.set_footer(text='Google Cloud Vision', icon_url=self.bot.get_asset('gcp.png'))
             embed.description = f'```\n{res["fullTextAnnotation"]["text"]}\n```'
-            embed.set_thumbnail(file=disnake.File(BytesIO(img)))
+            embed.set_thumbnail(file=disnake.File(fp=BytesIO(img), filename=link.split('/')[-1].split('?')[0]))
             await inter.send(embed=embed)
 
 def setup(bot: Bot):
