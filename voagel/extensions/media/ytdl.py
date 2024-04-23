@@ -61,7 +61,7 @@ class YtdlCommand(commands.Cog):
                     elif 'filesize_approx' in info and info['filesize_approx']:
                         if info['filesize_approx'] > 28214400:
                             await inter.delete_original_message()
-                        raise yt_dl.DownloadError(f'File is too large! ({bytes2human(info["filesize_approx"])})')
+                            raise yt_dl.DownloadError(f'File is too large! ({bytes2human(info["filesize_approx"])})')
                     else:
                         await inter.edit_original_message('Could not estimate the size of the file. This download might not finish.')
 
