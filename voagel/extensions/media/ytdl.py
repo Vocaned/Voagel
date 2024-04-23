@@ -39,7 +39,7 @@ class YtdlCommand(commands.Cog):
             'restrictfilenames': True,
             'quiet': True,
             'merge_output_format': 'mp4',
-            'format': 'bv*[filesize<20M]+ba[filesize<5M]/b[filesize<25M]/b[ext=mp4]/b'
+            'format': 'bv*[filesize<20M]+ba[filesize<5M]/b[filesize<25M]/b[ext=mp4]/bv[ext=mp4]+ba/b/bv+ba'
         }
 
         with tempfile.TemporaryDirectory() as tmpdir:
