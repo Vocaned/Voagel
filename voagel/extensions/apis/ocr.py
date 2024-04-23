@@ -6,6 +6,7 @@ import disnake
 from disnake.ext import commands
 from voagel.main import Bot, EMBED_COLOR
 
+SUPPORTED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 
 class OCRCommand(commands.Cog):
     """OCR"""
@@ -20,10 +21,9 @@ class OCRCommand(commands.Cog):
         }]}
         req = await self.bot.session.post(f'https://content-vision.googleapis.com/v1/images:annotate?key={self.bot.get_api_key("gcp_ocr")}', json=data)
         j = await req.json()
-        print(j)
 
-        if not j or not j['responses']:
-            raise Exception('Did not get a response from API.')
+        if 'error' in j:
+            raise Exception('Google Vision returned an error: ' + str(j['error']))
 
         return j['responses'][0]
 
@@ -42,6 +42,10 @@ class OCRCommand(commands.Cog):
 
         await inter.response.defer()
         imgres = await self.bot.session.get(link)
+
+        if imgres.content_type.lower() not in SUPPORTED_MIMES:
+            raise Exception(f'Unsupported file type `{imgres.content_type}`.')
+
         img = await imgres.read()
         res = await self.do_ocr(img)
         if not res['fullTextAnnotation']:
@@ -78,6 +82,10 @@ class OCRCommand(commands.Cog):
 
         await inter.response.defer()
         imgres = await self.bot.session.get(link)
+
+        if imgres.content_type.lower() not in SUPPORTED_MIMES:
+            raise Exception(f'Unsupported file type `{imgres.content_type}`.')
+
         img = await imgres.read()
         res = await self.do_ocr(img)
         if not res['fullTextAnnotation']:

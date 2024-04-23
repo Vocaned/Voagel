@@ -51,7 +51,7 @@ class ClassicubeCommand(commands.Cog):
         delta = datetime.now() - datetime.fromtimestamp(data['registered'])
 
         embed.set_image(url='https://123dmwm.com/img/3d.php?user='+data['username'])
-        embed.set_author(name=data['username'], icon_url=f'https://classicube.s3.amazonaws.com/face/{data["username"]}.png')
+        embed.set_author(name=data['username'], icon_url=f'https://cdn.classicube.net/face/{data["username"]}.png')
         embed.add_field(name='Account created', value=f'<t:{data["registered"]}:F>\n`{timedelta_format(delta)}` ago')
 
         if flags:
