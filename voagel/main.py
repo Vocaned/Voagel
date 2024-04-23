@@ -1,7 +1,6 @@
 import logging
 import disnake
 import sys
-import os
 import tomllib
 import aiohttp
 from pathlib import Path

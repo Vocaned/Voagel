@@ -3,14 +3,14 @@ from pycountry import languages
 
 async def language_autocomplete(_, string: str) -> List[str]:
     """Autocomplete languages with alpha2 codes"""
-    langs = []
+    out = []
 
-    for lang in languages:
+    for lang in languages.objects:
         try:
             if string.lower() in lang.name.lower() and lang.alpha_2:
-                langs.append(lang.name)
+                out.append(lang.name)
         except Exception:
             pass
 
-    return langs[:25]
+    return out[:25]
 

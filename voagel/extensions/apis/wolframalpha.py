@@ -1,10 +1,9 @@
 from io import BytesIO
-
+from urllib.parse import quote
 import disnake
 from disnake.ext import commands
 
 from voagel.main import Bot, EMBED_COLOR
-from voagel.utils import escape_url
 
 
 class WolframAlphaCommand(commands.Cog):
@@ -28,7 +27,7 @@ class WolframAlphaCommand(commands.Cog):
 
         await inter.response.defer()
         req = await self.bot.session.get(
-            f'http://api.wolframalpha.com/v1/simple?appid={self.bot.get_api_key("wolframalpha")}&layout=labelbar&ip=None&units=metric&background=2F3136&foreground=white&i={escape_url(query)}'
+            f'http://api.wolframalpha.com/v1/simple?appid={self.bot.get_api_key("wolframalpha")}&layout=labelbar&ip=None&units=metric&background=2F3136&foreground=white&i={quote(query)}'
         )
 
         if req.status != 200:

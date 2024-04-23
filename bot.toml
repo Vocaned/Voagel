@@ -3,6 +3,7 @@ discord = "TOKEN"
 wolframalpha = ""
 weatherapi = ""
 gcp_ocr = ""
+gcp_translate = ""
 
 [bot]
 status = "online" # online/idle/dnd/offline

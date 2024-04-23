@@ -1,12 +1,8 @@
 import typing
-import urllib.parse
 import asyncio
 import os
 import html.parser
 from datetime import timedelta
-
-def escape_url(url: str) -> str:
-    return urllib.parse.quote(url)
 
 async def re_encode(fp: str) -> None:
     if not os.path.exists(fp):

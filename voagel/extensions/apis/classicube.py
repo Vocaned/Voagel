@@ -1,8 +1,9 @@
 import disnake
 from disnake.ext import commands
 from datetime import datetime
+from urllib.parse import quote
 from voagel.main import EMBED_COLOR, Bot
-from voagel.utils import escape_url, timedelta_format
+from voagel.utils import timedelta_format
 
 class ClassicubeCommand(commands.Cog):
     """Classicube commands"""
@@ -37,7 +38,7 @@ class ClassicubeCommand(commands.Cog):
         username: Username of the player
         """
         await inter.response.defer()
-        username = escape_url(username)
+        username = quote(username)
 
         req = await self.bot.session.get(f'https://www.classicube.net/api/player/{username}')
         data = await req.json()

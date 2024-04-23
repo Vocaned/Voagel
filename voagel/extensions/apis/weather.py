@@ -1,9 +1,9 @@
 import disnake
 from disnake.ext import commands
 import datetime
+from urllib.parse import quote
 
 from voagel.main import Bot, EMBED_COLOR
-from voagel.utils import escape_url
 
 class WeatherCommand(commands.Cog):
     """Weather command"""
@@ -45,7 +45,7 @@ class WeatherCommand(commands.Cog):
             raise Exception("You're supposed to enter a city. This isn't one.")
 
         await inter.response.defer()
-        req = await self.bot.session.get(f'https://nominatim.openstreetmap.org/search?format=json&limit=25&accept-language=en&q={escape_url(location)}')
+        req = await self.bot.session.get(f'https://nominatim.openstreetmap.org/search?format=json&limit=25&accept-language=en&q={quote(location)}')
         geocoding = await req.json()
         if not geocoding:
             raise Exception('Location not found.')
