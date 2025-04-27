@@ -23,10 +23,10 @@ class Errors(commands.Cog):
         tree.on_error = self._old_tree_error
 
     async def log_error(self, inter: discord.Interaction, error: app_commands.AppCommandError, id: str):
-        if not self.bot.config['log_channel']:
+        if not self.bot.config['bot'].get('log_channel'):
             return
 
-        channel = self.bot.get_channel(self.bot.config['log_channel'])
+        channel = self.bot.get_channel(self.bot.config['bot'].get('log_channel'))
         if channel is None or not isinstance(channel, discord.TextChannel):
             return
 
