@@ -31,11 +31,8 @@ class Errors(commands.Cog):
         if channel is None or not isinstance(channel, discord.TextChannel):
             return
 
-
         assert inter.command
         content = f'/{inter.command.name} '
-        if inter.data:
-            content += str(inter.data)
 
         embed = discord.Embed(
             color=ERROR_COLOR,
@@ -43,7 +40,10 @@ class Errors(commands.Cog):
         )
         embed.set_footer(text=f'{id} uid{inter.user.id}-gid{inter.guild_id}')
 
-        await channel.send(content=content, embed=embed)
+        try:
+            await channel.send(content=content, embed=embed)
+        except Exception as e:
+            logging.error('Failed to log error %s', e)
 
     async def tree_on_error(self,
         inter: discord.Interaction,
