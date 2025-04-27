@@ -1,5 +1,6 @@
 import logging
 import traceback
+import uuid
 
 import discord
 from discord.ext import commands
@@ -21,6 +22,22 @@ class Errors(commands.Cog):
         tree = self.bot.tree
         tree.on_error = self._old_tree_error
 
+    async def log_error(self, inter: discord.Interaction, error: app_commands.AppCommandError, id: str):
+        if not self.bot.config['log_channel']:
+            return
+
+        channel = self.bot.get_channel(self.bot.config['log_channel'])
+        if channel is None or not isinstance(channel, discord.TextChannel):
+            return
+
+        embed = discord.Embed(
+            color=ERROR_COLOR,
+            description=f'```py\n{"\n".join(traceback.format_exception(type(error), error, error.__traceback__))}```'
+        )
+        embed.set_footer(text=f'{inter.user.id}-{inter.guild_id} {id}')
+
+        await channel.send(embed=embed)
+
     async def tree_on_error(self,
         inter: discord.Interaction,
         error: app_commands.AppCommandError
@@ -32,6 +49,8 @@ class Errors(commands.Cog):
 
         errtype = '[Unknown Error]'
         errmsg = None
+
+        errid = str(uuid.uuid1())
 
         if isinstance(error, app_commands.BotMissingPermissions):
             missing = [perm.replace('_', ' ').title() for perm in error.missing_permissions]
@@ -73,14 +92,13 @@ class Errors(commands.Cog):
             errtype = 'Failed to load extension.'
         elif isinstance(error, app_commands.CommandInvokeError):
             errtype = f'Uncaught exception occured in `{inter.command.name}`'
-
             original = getattr(error, 'original', error)
             errmsg = f'{type(original).__name__}: {original}'
-
-            self.bot.data['last_error'] = '\n'.join(traceback.format_exception(type(error), error, error.__traceback__))
-            logging.warning('Ignoring exception in /%s', inter.command.name)
+            await self.log_error(inter, error, errid)
+            logging.warning('Ignoring exception %s', errid)
 
         embed = discord.Embed(color=ERROR_COLOR, title=errtype, description=errmsg)
+        embed.set_footer(text=errid)
 
         if not inter.response.is_done():
             await inter.response.send_message(embed=embed, ephemeral=True)
