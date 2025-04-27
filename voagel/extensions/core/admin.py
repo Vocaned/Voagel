@@ -99,7 +99,7 @@ class AdminCommands(commands.Cog):
         """
         await inter.response.defer(thinking=True)
         await self.bot.load_extension('voagel.extensions.'+module)
-        await inter.response.send_message(f'Loaded {module}')
+        await inter.followup.send(f'Loaded {module}')
 
     @module.command()
     async def unload(self, inter: discord.Interaction, module: str):
@@ -111,7 +111,7 @@ class AdminCommands(commands.Cog):
         """
         await inter.response.defer(thinking=True)
         await self.bot.unload_extension('voagel.extensions.'+module)
-        await inter.response.send_message(f'Unloaded {module}')
+        await inter.followup.send(f'Unloaded {module}')
 
     @module.command()
     async def reload(self, inter: discord.Interaction, module: str):
@@ -123,7 +123,7 @@ class AdminCommands(commands.Cog):
         """
         await inter.response.defer(thinking=True)
         await self.bot.reload_extension('voagel.extensions.'+module)
-        await inter.response.send_message(f'Reloaded {module}')
+        await inter.followup.send(f'Reloaded {module}')
 
     @git.command()
     async def pull(self, inter: discord.Interaction):
@@ -131,7 +131,7 @@ class AdminCommands(commands.Cog):
         await inter.response.defer(thinking=True)
         out1 = await check_output(['git', 'pull'], timeout=30)
         out2 = await check_output(['git', 'log', '@{1}..', '--format=%h %an | %B'], timeout=30)
-        await inter.response.send_message(f'```{out1}\n\n{out2}```')
+        await inter.followup.send(f'```{out1}\n\n{out2}```')
 
     @git.command()
     async def fuck(self, inter: discord.Interaction):
