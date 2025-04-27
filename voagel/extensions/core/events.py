@@ -30,10 +30,6 @@ class EventCommands(commands.Cog):
         await self.log_event('IDENTIFY', hex(uuid.getnode()).lstrip("0x"))
 
     @commands.Cog.listener()
-    async def on_resumed(self):
-        await self.log_event('RESUME', hex(uuid.getnode()).lstrip("0x"))
-
-    @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         await self.log_event('GUILD_CREATE', f'{guild.name}\n{guild.id}')
 
