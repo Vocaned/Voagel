@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from voagel.main import Bot, EMBED_COLOR
+from voagel.utils import UserException
 
 class WhisperCommand(commands.Cog):
     """Whisper"""
@@ -44,7 +45,7 @@ class WhisperCommand(commands.Cog):
         else:
             link = re.search(r'https?://\S+', message.content)
             if not link:
-                raise Exception('Could not find audio in the specified message.')
+                raise UserException('Could not find audio in the specified message.')
             link = link.group()
 
         await inter.response.defer()
@@ -66,7 +67,7 @@ class WhisperCommand(commands.Cog):
         else:
             link = re.search(r'https?://\S+', message.content)
             if not link:
-                raise Exception('Could not find audio in the specified message.')
+                raise UserException('Could not find audio in the specified message.')
             link = link.group()
 
         await inter.response.defer()
@@ -98,11 +99,11 @@ class WhisperCommand(commands.Cog):
 
         if attachment:
             if link:
-                raise Exception('Both attachment and link provided. Please only enter one')
+                raise UserException('Both attachment and link provided. Please only enter one')
             link = attachment.url
 
         if not link:
-            raise Exception('No link or attachment provided')
+            raise UserException('No link or attachment provided')
 
         await inter.response.defer()
         req = await self.bot.session.get(link)

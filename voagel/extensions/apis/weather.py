@@ -5,6 +5,7 @@ import datetime
 from urllib.parse import quote
 
 from voagel.main import Bot, EMBED_COLOR
+from voagel.utils import UserException
 
 class WeatherCommand(commands.Cog):
     """Weather command"""
@@ -43,13 +44,13 @@ class WeatherCommand(commands.Cog):
         location: Name of the place
         """
         if location == '...':
-            raise Exception("You're supposed to enter a city. This isn't one.")
+            raise UserException("You're supposed to enter a city. This isn't one.")
 
         await inter.response.defer()
         req = await self.bot.session.get(f'https://nominatim.openstreetmap.org/search?format=json&limit=25&accept-language=en&q={quote(location)}')
         geocoding = await req.json()
         if not geocoding:
-            raise Exception('Location not found.')
+            raise UserException('Location not found.')
 
         req = await self.bot.session.get(f"https://api.weatherapi.com/v1/forecast.json?key={self.bot.get_api_key('weatherapi')}&q={geocoding[0]['lat']},{geocoding[0]['lon']}&aqi=yes&alerts=yes")
         data = await req.json()

@@ -10,6 +10,7 @@ import time
 import struct
 from io import BytesIO
 from voagel.main import Bot, EMBED_COLOR
+from voagel.utils import UserException
 
 
 class MinecraftCommands(commands.GroupCog, name='minecraft'):
@@ -81,7 +82,7 @@ class MinecraftCommands(commands.GroupCog, name='minecraft'):
             if 'id' in j:
                 return (j["name"], j['id'])
 
-        raise Exception('Player not found')
+        raise UserException('Player not found')
 
     async def get_skin(self, uuid: str) -> dict:
         req = await self.bot.session.get(f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}')
@@ -237,7 +238,7 @@ class MinecraftCommands(commands.GroupCog, name='minecraft'):
                 return data
         except socket.timeout as e:
             if not valid:
-                raise Exception('Could not connect to server. Make sure the IP is valid.') from e
+                raise UserException('Could not connect to server. Make sure the IP is valid.') from e
             raise e
 
     @app_commands.command()
