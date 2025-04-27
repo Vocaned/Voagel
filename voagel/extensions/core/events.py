@@ -27,11 +27,11 @@ class EventCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.log_event('IDENTIFY', f'{self.bot.user.id if self.bot.user else 'None'}-{hex(uuid.getnode()).lstrip("0x")}')
+        await self.log_event('IDENTIFY', hex(uuid.getnode()).lstrip("0x"))
 
     @commands.Cog.listener()
     async def on_resumed(self):
-        await self.log_event('RESUME', f'{self.bot.user.id if self.bot.user else 'None'}-{hex(uuid.getnode()).lstrip("0x")}')
+        await self.log_event('RESUME', hex(uuid.getnode()).lstrip("0x"))
 
 async def setup(bot: Bot):
     await bot.add_cog(EventCommands(bot))
