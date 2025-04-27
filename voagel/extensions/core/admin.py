@@ -28,6 +28,7 @@ class AdminCommands(commands.Cog):
     @admin.command()
     async def sync(self, inter: discord.Interaction):
         """Syncs all slash commands"""
+        await inter.response.defer(thinking=True)
         await self.bot.tree.sync()
         await inter.response.send_message('Synced commands.')
 
@@ -96,6 +97,7 @@ class AdminCommands(commands.Cog):
         ----------
         module: Name of the module
         """
+        await inter.response.defer(thinking=True)
         await self.bot.load_extension('voagel.extensions.'+module)
         await inter.response.send_message(f'Loaded {module}')
 
@@ -107,6 +109,7 @@ class AdminCommands(commands.Cog):
         ----------
         module: Name of the module
         """
+        await inter.response.defer(thinking=True)
         await self.bot.unload_extension('voagel.extensions.'+module)
         await inter.response.send_message(f'Unloaded {module}')
 
@@ -118,12 +121,14 @@ class AdminCommands(commands.Cog):
         ----------
         module: Name of the module
         """
+        await inter.response.defer(thinking=True)
         await self.bot.reload_extension('voagel.extensions.'+module)
         await inter.response.send_message(f'Reloaded {module}')
 
     @git.command()
     async def pull(self, inter: discord.Interaction):
         """Pull the git repo"""
+        await inter.response.defer(thinking=True)
         out1 = await check_output(['git', 'pull'], timeout=30)
         out2 = await check_output(['git', 'log', '@{1}..', '--format=%h %an | %B'], timeout=30)
         await inter.response.send_message(f'```{out1}\n\n{out2}```')
