@@ -32,9 +32,9 @@ class Errors(commands.Cog):
             return
 
         assert inter.command
-        content = f'/{inter.command.name} '
+        content = None
         if inter.data:
-            content += str(inter.data)
+            content = str(inter.data)[:2000]
 
         embed = discord.Embed(
             color=ERROR_COLOR,
@@ -43,7 +43,7 @@ class Errors(commands.Cog):
         embed.set_footer(text=f'{id} uid{inter.user.id}-gid{inter.guild_id}')
 
         try:
-            await channel.send(content=content[:2000], embed=embed)
+            await channel.send(content=content, embed=embed)
         except Exception as e:
             logging.error('Failed to log error %s', e)
 
