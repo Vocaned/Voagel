@@ -1,4 +1,3 @@
-from logging import ERROR
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -25,14 +24,6 @@ class AdminCommands(commands.Cog):
     admin.interaction_check = is_admin
     module.interaction_check = is_admin
     git.interaction_check = is_admin
-
-    @admin.command()
-    async def debug(self, inter: discord.Interaction):
-        """Show the latest error log"""
-        if not 'last_error' in self.bot.data:
-            await inter.response.send_message('No errors logged.', ephemeral=True)
-
-        await inter.response.send_message(f'```{self.bot.data["last_error"][-1990:]}```', ephemeral=True) # Tail 1990 chars
 
     @admin.command()
     async def sync(self, inter: discord.Interaction):
