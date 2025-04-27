@@ -7,6 +7,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from voagel.main import Bot, ERROR_COLOR
+from voagel.utils import UserException
 
 
 class Errors(commands.Cog):
@@ -34,7 +35,7 @@ class Errors(commands.Cog):
             color=ERROR_COLOR,
             description=f'```py\n{"\n".join(traceback.format_exception(type(error), error, error.__traceback__))}```'
         )
-        embed.set_footer(text=f'{inter.user.id}-{inter.guild_id} {id}')
+        embed.set_footer(text=f'{id} uid{inter.user.id}-gid{inter.guild_id}')
 
         await channel.send(embed=embed)
 
@@ -91,11 +92,15 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.ExtensionFailed):
             errtype = 'Failed to load extension.'
         elif isinstance(error, app_commands.CommandInvokeError):
-            errtype = f'Uncaught exception occured in `{inter.command.name}`'
             original = getattr(error, 'original', error)
-            errmsg = f'{type(original).__name__}: {original}'
-            await self.log_error(inter, error, errid)
-            logging.warning('Ignoring exception %s', errid)
+
+            if isinstance(original, UserException):
+                errtype = str(original)
+            else:
+                errtype = f'Uncaught exception occured in `{inter.command.name}`'
+                errmsg = f'{type(original).__name__}: {original}'
+                await self.log_error(inter, error, errid)
+                logging.warning('Catching exception %s', errid)
 
         embed = discord.Embed(color=ERROR_COLOR, title=errtype, description=errmsg)
         embed.set_footer(text=errid)

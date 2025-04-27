@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 from howlongtobeatpy import HowLongToBeat
 from voagel.main import Bot, EMBED_COLOR
+from voagel.utils import UserException
 
 class HowlongtobeatCommand(commands.Cog):
     """Howlongtobeat command"""
@@ -36,7 +37,7 @@ class HowlongtobeatCommand(commands.Cog):
 
             await inter.followup.send(embed=embed)
         else:
-            raise Exception('Game not found.')
+            raise UserException('Game not found.')
 
 async def setup(bot: Bot):
     await bot.add_cog(HowlongtobeatCommand(bot))

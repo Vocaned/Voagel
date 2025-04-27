@@ -4,6 +4,10 @@ import os
 import html.parser
 from datetime import timedelta
 
+class UserException(Exception):
+    """User error exception."""
+    ...
+
 async def re_encode(fp: str) -> None:
     if not os.path.exists(fp):
         raise Exception("File passed to Re-Encode doesn't exist")

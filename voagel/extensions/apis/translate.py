@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from voagel.main import Bot, EMBED_COLOR
+from voagel.utils import UserException
 
 class TranslateCommand(commands.Cog):
     """Translate"""
@@ -63,7 +64,7 @@ class TranslateCommand(commands.Cog):
 
         query = message.content
         if not query:
-            raise Exception('No text found in message.')
+            raise UserException('No text found in message.')
         data = (await self.do_translate(None, 'en', query))['translations'][0]
 
         fromlang = 'Unknown'

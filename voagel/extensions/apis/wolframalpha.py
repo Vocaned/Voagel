@@ -5,6 +5,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from voagel.main import Bot, EMBED_COLOR
+from voagel.utils import UserException
 
 
 class WolframAlphaCommand(commands.Cog):
@@ -37,7 +38,7 @@ class WolframAlphaCommand(commands.Cog):
                 err = '[unknown error]'
 
             if req.status == 501:
-                raise Exception('WolframAlpha could not parse the query', err)
+                raise UserException('WolframAlpha could not parse the query', err)
             raise Exception(f'WolframAlpha returned an error status {req.status}', err)
 
         data = await req.read()
