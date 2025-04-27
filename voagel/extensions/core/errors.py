@@ -31,13 +31,19 @@ class Errors(commands.Cog):
         if channel is None or not isinstance(channel, discord.TextChannel):
             return
 
+
+        assert inter.command
+        content = f'/{inter.command.name} '
+        if inter.data:
+            content += str(inter.data)
+
         embed = discord.Embed(
             color=ERROR_COLOR,
             description=f'```py\n{"\n".join(traceback.format_exception(type(error), error, error.__traceback__))}```'
         )
         embed.set_footer(text=f'{id} uid{inter.user.id}-gid{inter.guild_id}')
 
-        await channel.send(embed=embed)
+        await channel.send(content=content, embed=embed)
 
     async def tree_on_error(self,
         inter: discord.Interaction,
