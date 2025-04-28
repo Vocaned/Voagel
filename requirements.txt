@@ -1,5 +1,6 @@
 yt-dlp
-discord.py >= 2.4.0
+#discord.py >= 2.4.0
+git+https://github.com/DA-344/d.py@feat/components-v2 # temporary
 howlongtobeatpy >= 1.0.18
 feedparser >= 6.0.11
 mmh3 >= 4.1.0
