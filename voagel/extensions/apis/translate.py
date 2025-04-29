@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 
 from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import UserException
@@ -8,13 +8,13 @@ from voagel.utils import UserException
 class TranslateCommand(commands.Cog):
     """Translate"""
 
-    class OutputView(discord.ui.LayoutView):
+    class OutputView(ui.LayoutView):
         def __init__(self, fromlang: str, fromtext: str, tolang: str, totext: str, confidence: float | None = None):
             super().__init__()
-            container = discord.ui.Container()
-            container.add_item(discord.ui.TextDisplay(f'### From {fromlang}\n{fromtext}'))
-            container.add_item(discord.ui.Separator())
-            container.add_item(discord.ui.TextDisplay(f'### To {tolang}\n{totext}' + (f'\n-# confidence: {round(confidence*100, 2)}%' if confidence else '')))
+            container = ui.Container()
+            container.add_item(ui.TextDisplay(f'### From {fromlang}\n{fromtext}'))
+            container.add_item(ui.Separator())
+            container.add_item(ui.TextDisplay(f'### To {tolang}\n{totext}' + (f'\n-# confidence: {round(confidence*100, 2)}%' if confidence else '')))
             self.add_item(container)
 
     def __init__(self, bot: Bot):
