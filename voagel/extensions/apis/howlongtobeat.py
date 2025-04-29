@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 from howlongtobeatpy import HowLongToBeat
 from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import UserException
@@ -10,6 +10,24 @@ class HowlongtobeatCommand(commands.Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
+
+    class OutputView(ui.LayoutView):
+        def __init__(self, result):
+            super().__init__()
+            container = ui.Container()
+            container.add_item(ui.Section(ui.TextDisplay(f'## {result.game_name}'), accessory=ui.Button(label='HowLongToBeat', url=result.game_web_link)))
+
+            bottomtext = ui.TextDisplay(f'''
+**Main Story** {result.main_story} hours
+**Main + Extra** {result.main_extra} hours
+**Completionist** {result.completionist} hours
+''')
+            if result.game_image_url:
+                container.add_item(ui.Section(bottomtext, accessory=ui.Thumbnail(result.game_image_url)))
+            else:
+                container.add_item(bottomtext)
+
+            self.add_item(container)
 
     @app_commands.command()
     async def howlongtobeat(self,
@@ -26,16 +44,8 @@ class HowlongtobeatCommand(commands.Cog):
         results = await HowLongToBeat().async_search(game)
         if results is not None and len(results) > 0:
             result = max(results, key=lambda element: element.similarity)
-            embed = discord.Embed(title=result.game_name, url=result.game_web_link, color=EMBED_COLOR)
-            embed.add_field(name='Main Story', value=f'{result.main_story} Hours')
-            embed.add_field(name='Main + Extra', value=f'{result.main_extra} Hours')
-            embed.add_field(name='Completionist', value=f'{result.completionist} Hours')
-            embed.set_footer(text='HowLongToBeat', icon_url=self.bot.get_asset('hltb_brand.png'))
-
-            if result.game_image_url:
-                embed.set_thumbnail(url=result.game_image_url)
-
-            await inter.followup.send(embed=embed)
+            view = self.OutputView(result)
+            await inter.followup.send(view=view)
         else:
             raise UserException('Game not found.')
 
