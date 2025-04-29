@@ -5,7 +5,7 @@ from io import BytesIO
 
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import UserException
 
@@ -22,6 +22,13 @@ class WhisperCommand(commands.Cog):
             name='Transcribe (Translate)',
             callback=self.auto_translate
         ))
+
+    class OutputView(ui.LayoutView):
+        def __init__(self, res: str):
+            super().__init__()
+            container = ui.Container()
+            container.add_item(ui.TextDisplay(res))
+            self.add_item(container)
 
 
     async def do_transcribe(self, audio: bytes, content_type: str, task: str = 'transcribe') -> str:
@@ -53,10 +60,8 @@ class WhisperCommand(commands.Cog):
         audio = await req.read()
         res = await self.do_transcribe(audio, req.content_type, task='translate')
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_footer(text='Whisper', icon_url=self.bot.get_asset('oai.png'))
-        embed.description = f'```\n{res}\n```'
-        await inter.followup.send(embed=embed)
+        view = self.OutputView(res)
+        await inter.followup.send(view=view)
 
     async def auto_transcribe(self, inter: discord.Interaction, message: discord.Message):
         """
@@ -75,10 +80,8 @@ class WhisperCommand(commands.Cog):
         audio = await req.read()
         res = await self.do_transcribe(audio, req.content_type)
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_footer(text='Whisper', icon_url=self.bot.get_asset('oai.png'))
-        embed.description = f'```\n{res}\n```'
-        await inter.followup.send(embed=embed)
+        view = self.OutputView(res)
+        await inter.followup.send(view=view)
 
     @app_commands.command(name='transcribe')
     async def transcribe(self,
@@ -110,10 +113,8 @@ class WhisperCommand(commands.Cog):
         audio = await req.read()
         res = await self.do_transcribe(audio, req.content_type, task='translate' if translate else 'transcribe')
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_footer(text='Whisper', icon_url=self.bot.get_asset('oai.png'))
-        embed.description = f'```\n{res}\n```'
-        await inter.followup.send(embed=embed)
+        view = self.OutputView(res)
+        await inter.followup.send(view=view)
 
 async def setup(bot: Bot):
     await bot.add_cog(WhisperCommand(bot))
