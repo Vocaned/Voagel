@@ -2,7 +2,7 @@ from io import BytesIO
 from urllib.parse import quote
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 
 from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import UserException
@@ -45,11 +45,9 @@ class WolframAlphaCommand(commands.Cog):
         if len(data) == 0:
             raise Exception('WolframAlpha did not return any data.')
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        file=discord.File(BytesIO(data), 'wolfram.png')
-        embed.set_image(url='attachment://wolfram.png')
-        embed.set_footer(text='Wolfram Alpha', icon_url=self.bot.get_asset('wolfram.png'))
-        await inter.followup.send(embed=embed, file=file)
+        view = ui.LayoutView()
+        view.add_item(ui.Container(ui.MediaGallery(discord.MediaGalleryItem('attachment://wolfram.png'))))
+        await inter.followup.send(view=view, file=discord.File(BytesIO(data), 'wolfram.png'))
 
 
 async def setup(bot: Bot):
