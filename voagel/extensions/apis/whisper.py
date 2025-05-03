@@ -23,14 +23,6 @@ class WhisperCommand(commands.Cog):
             callback=self.auto_translate
         ))
 
-    class OutputView(ui.LayoutView):
-        def __init__(self, res: str):
-            super().__init__()
-            container = ui.Container()
-            container.add_item(ui.TextDisplay(res))
-            self.add_item(container)
-
-
     async def do_transcribe(self, audio: bytes, content_type: str, task: str = 'transcribe') -> str:
         data = aiohttp.FormData()
         data.add_field('audio_file',
@@ -60,7 +52,8 @@ class WhisperCommand(commands.Cog):
         audio = await req.read()
         res = await self.do_transcribe(audio, req.content_type, task='translate')
 
-        view = self.OutputView(res)
+        view = ui.LayoutView()
+        view.add_item(ui.Container(ui.TextDisplay(res)))
         await inter.followup.send(view=view)
 
     async def auto_transcribe(self, inter: discord.Interaction, message: discord.Message):
@@ -80,7 +73,8 @@ class WhisperCommand(commands.Cog):
         audio = await req.read()
         res = await self.do_transcribe(audio, req.content_type)
 
-        view = self.OutputView(res)
+        view = ui.LayoutView()
+        view.add_item(ui.Container(ui.TextDisplay(res)))
         await inter.followup.send(view=view)
 
     @app_commands.command(name='transcribe')
@@ -113,7 +107,8 @@ class WhisperCommand(commands.Cog):
         audio = await req.read()
         res = await self.do_transcribe(audio, req.content_type, task='translate' if translate else 'transcribe')
 
-        view = self.OutputView(res)
+        view = ui.LayoutView()
+        view.add_item(ui.Container(ui.TextDisplay(res)))
         await inter.followup.send(view=view)
 
 async def setup(bot: Bot):

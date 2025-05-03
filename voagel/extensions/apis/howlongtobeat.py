@@ -11,24 +11,6 @@ class HowlongtobeatCommand(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    class OutputView(ui.LayoutView):
-        def __init__(self, result):
-            super().__init__()
-            container = ui.Container()
-            container.add_item(ui.Section(ui.TextDisplay(f'## {result.game_name}'), accessory=ui.Button(label='HowLongToBeat', url=result.game_web_link)))
-
-            bottomtext = ui.TextDisplay(f'''
-**Main Story** {result.main_story} hours
-**Main + Extra** {result.main_extra} hours
-**Completionist** {result.completionist} hours
-''')
-            if result.game_image_url:
-                container.add_item(ui.Section(bottomtext, accessory=ui.Thumbnail(result.game_image_url)))
-            else:
-                container.add_item(bottomtext)
-
-            self.add_item(container)
-
     @app_commands.command()
     async def howlongtobeat(self,
         inter: discord.Interaction,
@@ -44,7 +26,21 @@ class HowlongtobeatCommand(commands.Cog):
         results = await HowLongToBeat().async_search(game)
         if results is not None and len(results) > 0:
             result = max(results, key=lambda element: element.similarity)
-            view = self.OutputView(result)
+
+            view = ui.LayoutView()
+            container = ui.Container()
+            container.add_item(ui.Section(ui.TextDisplay(f'## {result.game_name}'), accessory=ui.Button(label='HowLongToBeat', url=result.game_web_link)))
+            bottomtext = ui.TextDisplay(f'''
+**Main Story** {result.main_story} hours
+**Main + Extra** {result.main_extra} hours
+**Completionist** {result.completionist} hours
+''')
+            if result.game_image_url:
+                container.add_item(ui.Section(bottomtext, accessory=ui.Thumbnail(result.game_image_url)))
+            else:
+                container.add_item(bottomtext)
+
+            container.add_item(container)
             await inter.followup.send(view=view)
         else:
             raise UserException('Game not found.')

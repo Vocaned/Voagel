@@ -15,24 +15,6 @@ class CVECommand(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    class OutputView(ui.LayoutView):
-        def __init__(self, data: dict):
-            super().__init__()
-            container = ui.Container()
-            container.add_item(ui.TextDisplay(f'### {data["cve_id"]}\n{data["summary"]}'))
-
-            buttons = ui.ActionRow()
-            for link in list(dict.fromkeys(data['references']))[:5]: # Remove duplicates and slice at 5 elements
-                buttons.add_item(ui.Button(label=parse.urlparse(link).netloc, url=link))
-            if buttons.children:
-                container.add_item(buttons)
-
-            severity = data['cvss']
-            sevstr = 'None' if severity == 0 else 'Low' if severity < 4 else 'Medium' if severity < 7 else 'High' if severity < 9 else 'Critical' if severity < 10 else 'Unknown'
-            container.add_item(ui.TextDisplay(f'{severity} {sevstr} (v{data["cvss_version"]}) <t:{int(datetime.fromisoformat(data["published_time"]).timestamp())}>'))
-
-            self.add_item(container)
-
     @app_commands.command()
     async def cve(self,
         inter: discord.Interaction,
@@ -60,7 +42,23 @@ class CVECommand(commands.Cog):
 
             raise Exception(f'Got an error status {req.status}', err)
 
-        view = self.OutputView(await req.json())
+        data = await req.json()
+
+        view = ui.LayoutView()
+        container = ui.Container()
+        container.add_item(ui.TextDisplay(f'### {data["cve_id"]}\n{data["summary"]}'))
+
+        buttons = ui.ActionRow()
+        for link in list(dict.fromkeys(data['references']))[:5]: # Remove duplicates and slice at 5 elements
+            buttons.add_item(ui.Button(label=parse.urlparse(link).netloc, url=link))
+        if buttons.children:
+            container.add_item(buttons)
+
+        severity = data['cvss']
+        sevstr = 'None' if severity == 0 else 'Low' if severity < 4 else 'Medium' if severity < 7 else 'High' if severity < 9 else 'Critical' if severity < 10 else 'Unknown'
+        container.add_item(ui.TextDisplay(f'{severity} {sevstr} (v{data["cvss_version"]}) <t:{int(datetime.fromisoformat(data["published_time"]).timestamp())}>'))
+
+        view.add_item(container)
         await inter.followup.send(view=view)
 
 
