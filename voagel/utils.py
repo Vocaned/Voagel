@@ -12,7 +12,7 @@ async def re_encode(fp: str) -> None:
     if not os.path.exists(fp):
         raise Exception("File passed to Re-Encode doesn't exist")
 
-    out = await check_output(['ffmpeg', '-y', '-i', fp, '-c:a', 'copy', f'{os.path.split(fp)[0]}/2{os.path.split(fp)[1]}'])
+    out = await check_output(['ffmpeg', '-y', '-i', fp, '-c', 'copy', '-bsf:a', 'aac_adtstoasc', f'{os.path.split(fp)[0]}/2{os.path.split(fp)[1]}'])
     if not os.path.exists(f'{os.path.split(fp)[0]}/2{os.path.split(fp)[1]}'):
         raise Exception('Video encoding failed: \n'+out)
     os.replace(f'{os.path.split(fp)[0]}/2{os.path.split(fp)[1]}', fp)
