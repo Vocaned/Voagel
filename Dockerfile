@@ -5,8 +5,6 @@ WORKDIR /app
 
 RUN apk add --no-cache git ffmpeg
 
-USER 1000
-
 COPY --chown=1000:1000 requirements.txt /app
 RUN pip install -r requirements.txt
 
@@ -14,5 +12,6 @@ RUN pip install -r requirements.txt
 RUN git config --global pull.rebase false
 RUN git config --global safe.directory '*'
 
+USER 1000
 # requires mounting src to /app
 CMD ["python", "-m", "voagel.main"]
