@@ -12,9 +12,9 @@ class TranslateCommand(commands.Cog):
         def __init__(self, fromlang: str, fromtext: str, tolang: str, totext: str, confidence: float | None = None):
             super().__init__()
             container = ui.Container()
-            container.add_item(ui.TextDisplay(f'### From {fromlang}\n{fromtext}'))
+            container.add_item(ui.TextDisplay(f'### From {fromlang.title()}\n{fromtext}'))
             container.add_item(ui.Separator())
-            container.add_item(ui.TextDisplay(f'### To {tolang}\n{totext}' + (f'\n-# confidence: {round(confidence*100, 2)}%' if confidence else '')))
+            container.add_item(ui.TextDisplay(f'### To {tolang.title()}\n{totext}' + (f'\n-# confidence: {round(confidence*100, 2)}%' if confidence else '')))
             self.add_item(container)
 
     def __init__(self, bot: Bot):
@@ -38,7 +38,7 @@ class TranslateCommand(commands.Cog):
                 raise Exception('Google Translate returned an error: ' + str(data['error']))
 
             for l in data['data']['languages']:
-                self.gcp_languages[l['name']] = l['language']
+                self.gcp_languages[l['name'].lower()] = l['language']
 
         return self.gcp_languages
 
@@ -143,7 +143,7 @@ class TranslateCommand(commands.Cog):
         for lang, __ in (await self.get_languages()).items():
             try:
                 if string.lower() in lang.lower():
-                    out.append(lang)
+                    out.append(lang.lower())
             except Exception:
                 pass
 
