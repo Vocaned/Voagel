@@ -83,7 +83,7 @@ class TranslateCommand(commands.Cog):
                 if fromcode == code:
                     fromlang = lang
 
-        view = self.OutputView(fromlang, query, 'English', data['translatedText'], data['confidence'] if 'confidence' in data and data['confidence'] < 1.0 else None)
+        view = self.OutputView(fromlang, query, 'english', data['translatedText'], data['confidence'] if 'confidence' in data and data['confidence'] < 1.0 else None)
         await inter.followup.send(view=view)
 
     @app_commands.rename(_from='from')
@@ -92,7 +92,7 @@ class TranslateCommand(commands.Cog):
         inter: discord.Interaction,
         query: str,
         _from: str = 'auto',
-        to: str = 'English'
+        to: str = 'english'
     ):
         """
         Translate stuff using Google Translate. Defaults to Auto-Detect -> English
@@ -112,11 +112,11 @@ class TranslateCommand(commands.Cog):
         tocode = None
 
         if fromlang:
-            fromcode = (await self.get_languages()).get(fromlang)
+            fromcode = (await self.get_languages()).get(fromlang.lower())
             if not fromcode:
                 raise commands.BadArgument(f'No language found by `{fromlang}`')
 
-        tocode = (await self.get_languages()).get(tolang)
+        tocode = (await self.get_languages()).get(tolang.lower())
         if not tocode:
             raise commands.BadArgument(f'No language found by `{to}`')
 
@@ -143,7 +143,7 @@ class TranslateCommand(commands.Cog):
         for lang, __ in (await self.get_languages()).items():
             try:
                 if string.lower() in lang.lower():
-                    out.append(lang.lower())
+                    out.append(lang)
             except Exception:
                 pass
 
