@@ -40,7 +40,7 @@ class HowlongtobeatCommand(commands.Cog):
             else:
                 container.add_item(bottomtext)
 
-            container.add_item(container)
+            view.add_item(container)
             await inter.followup.send(view=view)
         else:
             raise UserException('Game not found.')
