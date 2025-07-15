@@ -50,13 +50,13 @@ class CVECommand(commands.Cog):
 
         buttons = ui.ActionRow()
         for link in list(dict.fromkeys(data['references']))[:5]: # Remove duplicates and slice at 5 elements
-            buttons.add_item(ui.Button(label=parse.urlparse(link).netloc, url=link))
+            buttons.add_item(ui.Button(label=str(parse.urlparse(link).netloc).lstrip('www.'), url=link))
         if buttons.children:
             container.add_item(buttons)
 
         severity = data['cvss']
         sevstr = 'None' if severity == 0 else 'Low' if severity < 4 else 'Medium' if severity < 7 else 'High' if severity < 9 else 'Critical' if severity < 10 else 'Unknown'
-        container.add_item(ui.TextDisplay(f'{severity} {sevstr} (v{data["cvss_version"]}) <t:{int(datetime.fromisoformat(data["published_time"]).timestamp())}>'))
+        container.add_item(ui.TextDisplay(f'{severity} {sevstr} (v{data["cvss_version"]}) **@** <t:{int(datetime.fromisoformat(data["published_time"]).timestamp())}>'))
 
         view.add_item(container)
         await inter.followup.send(view=view)
