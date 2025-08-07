@@ -37,9 +37,10 @@ class Errors(commands.Cog):
         if inter.data:
             content = str(inter.data)[:2000]
 
+        desc = "\n".join(traceback.format_exception(type(error), error, error.__traceback__))[:4080]
         embed = discord.Embed(
             color=ERROR_COLOR,
-            description=f'```py\n{"\n".join(traceback.format_exception(type(error), error, error.__traceback__))[:4080]}```'
+            description=f'```py\n{desc}```'
         )
         embed.set_footer(text=f'{id} uid{inter.user.id}-gid{inter.guild_id}')
 
