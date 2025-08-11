@@ -6,3 +6,4 @@ dist
 voagel/extensions/secret
 build
 *.egg-info
+eval_path
