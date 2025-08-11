@@ -1,2 +1,4 @@
 dnsutils
 qalc
+curl
+jq
