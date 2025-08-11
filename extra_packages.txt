@@ -1,4 +1,0 @@
-dnsutils
-qalc
-curl
-jq
