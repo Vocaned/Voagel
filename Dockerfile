@@ -5,7 +5,7 @@ WORKDIR /app
 
 RUN sed -i 's/^Components: main$/& contrib non-free/' /etc/apt/sources.list.d/debian.sources
 RUN apt update
-RUN apt install -y python3 python3-pip git ffmpeg xonsh software-properties-common
+RUN apt install -y python3 python3-pip git ffmpeg xonsh
 
 # optional packages for eval usage
 COPY extra_packages.txt /tmp/packages.txt
