@@ -55,7 +55,11 @@ class CVECommand(commands.Cog):
             container.add_item(buttons)
 
         severity = data['cvss']
-        sevstr = 'None' if severity == 0 else 'Low' if severity < 4 else 'Medium' if severity < 7 else 'High' if severity < 9 else 'Critical' if severity <= 10 else 'Unknown'
+        try:
+            severity = float(severity)
+            sevstr = 'None' if severity == 0 else 'Low' if severity < 4 else 'Medium' if severity < 7 else 'High' if severity < 9 else 'Critical' if severity <= 10 else 'Unknown'
+        except (ValueError, TypeError):
+            sevstr = 'Unknown'
         container.add_item(ui.TextDisplay(f'{severity} {sevstr} (v{data["cvss_version"]}) **@** <t:{int(datetime.fromisoformat(data["published_time"]).timestamp())}>'))
 
         view.add_item(container)
