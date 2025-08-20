@@ -30,7 +30,7 @@ class AdminCommands(commands.Cog):
         """Syncs all slash commands"""
         await inter.response.defer(thinking=True)
         await self.bot.tree.sync()
-        await inter.response.send_message('Synced commands.')
+        await inter.followup.send('Synced commands.')
 
     class EvalModal(discord.ui.Modal, title='Eval'):
         code = discord.ui.TextInput(
@@ -84,7 +84,6 @@ class AdminCommands(commands.Cog):
                     output = '[No response]'
                 await inter.response.send_message(output)
 
-    @commands.is_owner()
     @admin.command()
     async def eval(self, inter: discord.Interaction):
         await inter.response.send_modal(self.EvalModal())

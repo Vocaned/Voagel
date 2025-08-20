@@ -50,6 +50,7 @@ def main() -> None:
     bot = Bot(
         intents=discord.Intents.all(),
         allowed_installs=app_commands.AppInstallationType(guild=True, user=True),
+        allowed_contexts=app_commands.AppCommandContext(guild=True, dm_channel=True, private_channel=True),
         command_prefix='whythefuckdoihavetoprovideacommandprefixidonthaveanytextcommands...',
     )
     bot.load_config()
