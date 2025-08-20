@@ -16,7 +16,7 @@ class ModCommands(commands.Cog):
     @commands.has_permissions(ban_members=True)
     async def hackban(self,
         inter: discord.Interaction,
-        id: int,
+        id: str,
         reason: str = ''
     ):
         """Ban an user by their ID

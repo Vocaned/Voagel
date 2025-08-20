@@ -1,10 +1,11 @@
+from datetime import timedelta
 import logging
 import traceback
 import uuid
 
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 
 from voagel.main import Bot, ERROR_COLOR
 from voagel.utils import UserException
@@ -36,9 +37,10 @@ class Errors(commands.Cog):
         if inter.data:
             content = str(inter.data)[:2000]
 
+        desc = "\n".join(traceback.format_exception(type(error), error, error.__traceback__))[:4080]
         embed = discord.Embed(
             color=ERROR_COLOR,
-            description=f'```py\n{"\n".join(traceback.format_exception(type(error), error, error.__traceback__))[:4080]}```'
+            description=f'```py\n{desc}```'
         )
         embed.set_footer(text=f'{id} uid{inter.user.id}-gid{inter.guild_id}')
 
@@ -110,14 +112,17 @@ class Errors(commands.Cog):
                 await self.log_error(inter, error, errid)
                 logging.warning('Catching exception %s', errid)
 
-        embed = discord.Embed(color=ERROR_COLOR, title=errtype, description=errmsg)
-        embed.set_footer(text=errid)
+        view = ui.LayoutView()
+        container = ui.Container(accent_color=ERROR_COLOR)
+        container.add_item(ui.TextDisplay(f'### {errtype}\n{errmsg if errmsg else ""}'))
+        container.add_item(ui.TextDisplay(f'-# {errid}'))
+        view.add_item(container)
 
         if not inter.response.is_done():
-            await inter.response.send_message(embed=embed, ephemeral=True)
+            await inter.response.send_message(view=view, ephemeral=True)
         else:
             await inter.delete_original_response()
-            await inter.followup.send(embed=embed, ephemeral=True)
+            await inter.followup.send(view=view, ephemeral=True)
 
 async def setup(bot: Bot):
     await bot.add_cog(Errors(bot))

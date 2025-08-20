@@ -2,8 +2,9 @@ from io import BytesIO
 from urllib.parse import quote
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 from datetime import datetime
+from urllib import parse
 
 from voagel.main import Bot, EMBED_COLOR
 
@@ -43,19 +44,31 @@ class CVECommand(commands.Cog):
 
         data = await req.json()
 
+        view = ui.LayoutView()
+        container = ui.Container()
+        container.add_item(ui.TextDisplay(f'### {data["cve_id"]}\n{data["summary"]}'))
+
+        buttons = ui.ActionRow()
+        for link in list(dict.fromkeys(data['references']))[:5]: # Remove duplicates and slice at 5 elements
+            buttons.add_item(ui.Button(label=str(parse.urlparse(link).netloc).lstrip('www.'), url=link))
+        if buttons.children:
+            container.add_item(buttons)
+
         severity = data['cvss']
-        sevstr = 'None' if severity == 0 else 'Low' if severity < 4 else 'Medium' if severity < 7 else 'High' if severity < 9 else 'Critical' if severity < 10 else 'Unknown'
+        sevstr = None
+        try:
+            severity = float(severity)
+            sevstr = 'None' if severity == 0 else 'Low' if severity < 4 else 'Medium' if severity < 7 else 'High' if severity < 9 else 'Critical' if severity <= 10 else None
+        except (ValueError, TypeError):
+            pass
 
-        embed = discord.Embed(color=EMBED_COLOR, title=data['cve_id'], description=data['summary'])
-        embed.set_footer(text=f'{severity} {sevstr} (v{data["cvss_version"]})')
-        embed.timestamp = datetime.fromisoformat(data['published_time'])
+        if sevstr and data["cvss_version"]:
+            container.add_item(ui.TextDisplay(f'{severity} {sevstr} (v{data["cvss_version"]}) **@** <t:{int(datetime.fromisoformat(data["published_time"]).timestamp())}>'))
+        else:
+            container.add_item(ui.TextDisplay(f'Unknown severity **@** <t:{int(datetime.fromisoformat(data["published_time"]).timestamp())}>'))
 
-        if data['references']:
-            embed.url = data['references'][0]
-            assert embed.description
-            embed.description += '\n' + ' '.join([f'[[{x+1}]]({y})' for x,y in enumerate(data['references'])])
-
-        await inter.followup.send(embed=embed)
+        view.add_item(container)
+        await inter.followup.send(view=view)
 
 
 async def setup(bot: Bot):

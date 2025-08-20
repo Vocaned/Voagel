@@ -1,12 +1,21 @@
 import discord
 from discord.ext import commands
-from discord import app_commands
+from discord import app_commands, ui
 
 from voagel.main import Bot, EMBED_COLOR
 from voagel.utils import UserException
 
 class TranslateCommand(commands.Cog):
     """Translate"""
+
+    class OutputView(ui.LayoutView):
+        def __init__(self, fromlang: str, fromtext: str, tolang: str, totext: str, confidence: float | None = None):
+            super().__init__()
+            container = ui.Container()
+            container.add_item(ui.TextDisplay(f'### From {fromlang.title()}\n{fromtext}'))
+            container.add_item(ui.Separator())
+            container.add_item(ui.TextDisplay(f'### To {tolang.title()}\n{totext}' + (f'\n-# confidence: {round(confidence*100, 2)}%' if confidence else '')))
+            self.add_item(container)
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -29,7 +38,7 @@ class TranslateCommand(commands.Cog):
                 raise Exception('Google Translate returned an error: ' + str(data['error']))
 
             for l in data['data']['languages']:
-                self.gcp_languages[l['name']] = l['language']
+                self.gcp_languages[l['name'].lower()] = l['language']
 
         return self.gcp_languages
 
@@ -74,15 +83,8 @@ class TranslateCommand(commands.Cog):
                 if fromcode == code:
                     fromlang = lang
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.add_field(name=f'From `{fromlang}`', value=f'```\n{query}\n```', inline=False)
-        embed.add_field(name='To `English`', value=f'```\n{data['translatedText']}\n```', inline=False)
-        embed.set_footer(text='Google Translate', icon_url=self.bot.get_asset('google_translate.png'))
-
-        if 'confidence' in data and data['confidence'] < 1.0:
-            embed.description = f'(confidence: {round(data["confidence"]*100, 2)}%)'
-
-        await inter.followup.send(embed=embed)
+        view = self.OutputView(fromlang, query, 'english', data['translatedText'], data['confidence'] if 'confidence' in data and data['confidence'] < 1.0 else None)
+        await inter.followup.send(view=view)
 
     @app_commands.rename(_from='from')
     @app_commands.command()
@@ -90,7 +92,7 @@ class TranslateCommand(commands.Cog):
         inter: discord.Interaction,
         query: str,
         _from: str = 'auto',
-        to: str = 'English'
+        to: str = 'english'
     ):
         """
         Translate stuff using Google Translate. Defaults to Auto-Detect -> English
@@ -110,11 +112,11 @@ class TranslateCommand(commands.Cog):
         tocode = None
 
         if fromlang:
-            fromcode = (await self.get_languages()).get(fromlang)
+            fromcode = (await self.get_languages()).get(fromlang.lower())
             if not fromcode:
                 raise commands.BadArgument(f'No language found by `{fromlang}`')
 
-        tocode = (await self.get_languages()).get(tolang)
+        tocode = (await self.get_languages()).get(tolang.lower())
         if not tocode:
             raise commands.BadArgument(f'No language found by `{to}`')
 
@@ -126,15 +128,10 @@ class TranslateCommand(commands.Cog):
                 if fromcode == code:
                     fromlang = lang
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.add_field(name=f'From `{fromlang}`', value=f'```\n{query}\n```', inline=False)
-        embed.add_field(name=f'To `{tolang}`', value=f'```\n{data['translatedText']}\n```', inline=False)
-        embed.set_footer(text='Google Translate', icon_url=self.bot.get_asset('google_translate.png'))
 
-        if 'confidence' in data and data['confidence'] < 1.0:
-            embed.description = f'(confidence: {round(data["confidence"]*100, 2)}%)'
-
-        await inter.followup.send(embed=embed)
+        view = self.OutputView(str(fromlang), query, tolang, data['translatedText'], data['confidence'] if 'confidence' in data and data['confidence'] < 1.0 else None)
+        print(str(view.to_components()))
+        await inter.followup.send(view=view)
 
     @translate.autocomplete('_from')
     @translate.autocomplete('to')
