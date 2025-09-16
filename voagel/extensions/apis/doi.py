@@ -41,9 +41,18 @@ class DOICommand(commands.Cog):
         try:
             library = bibtexparser.parse_string(text)
             data = library.entries[0].fields_dict
+            output = f'### [{data["title"].value}]({data["url"].value})'
+            if 'author' in data:
+                output += f'{data["author"].value}\n'
+            if 'year' in data:
+                if 'month' in data:
+                    output += f'-# {data["month"].value.title()} {data["year"].value}'
+                else:
+                    output += f'-# {data["year"].value}'
+
             view = ui.LayoutView()
             container = ui.Container()
-            container.add_item(ui.TextDisplay(f'### [{data["title"].value}]({data["url"].value})\n{data["author"].value}\n-# {data["month"].value.title()} {data["year"].value}'))
+            container.add_item(ui.TextDisplay(output))
         except:
             raise Exception('Failed to parse bibtex')
 
