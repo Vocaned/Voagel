@@ -44,7 +44,7 @@ class DOICommand(commands.Cog):
             output = []
             output.append(f'### [{data["title"].value}]({data["url"].value})')
             if 'author' in data:
-                output.append(f'{data["author"].value}\n')
+                output.append(f'{data["author"].value}')
             if 'year' in data:
                 if 'month' in data:
                     output.append(f'-# {data["month"].value.title()} {data["year"].value}')
