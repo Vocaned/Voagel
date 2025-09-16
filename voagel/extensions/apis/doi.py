@@ -43,10 +43,9 @@ class DOICommand(commands.Cog):
             data = library.entries[0].fields_dict
             view = ui.LayoutView()
             container = ui.Container()
-            container.add_item(ui.TextDisplay(f'### [{data["title"]}]({data["url"]})\n{data["author"]}\n-# {data["month"].title()} {data["year"]}'))
+            container.add_item(ui.TextDisplay(f'### [{data["title"].value}]({data["url"].value})\n{data["author"].value}\n-# {data["month"].value.title()} {data["year"].value}'))
         except:
             raise Exception('Failed to parse bibtex')
-
 
         view.add_item(container)
         await inter.followup.send(view=view)
