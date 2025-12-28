@@ -184,10 +184,10 @@ class MinecraftCommands(commands.GroupCog, name='minecraft'):
 
         embeds = []
         embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_author(name=user, icon_url=f'https://crafatar.com/avatars/{uuid}.png')
+        embed.set_author(name=user, icon_url=f'https://minotar.net/avatar/{uuid}.png')
         embed.set_footer(text=f'Minecraft', icon_url=self.bot.get_asset('minecraft.png'))
         embed.timestamp = datetime.now()
-        embed.set_image(url=f'https://crafatar.com/renders/body/{uuid}.png')
+        embed.set_image(url=f'https://minotar.net/body/{uuid}.png')
 
         embed.add_field(name='UUID', value=uuid)
         try:
@@ -198,14 +198,14 @@ class MinecraftCommands(commands.GroupCog, name='minecraft'):
 
         if 'CAPE' in skin['textures']:
             embed = discord.Embed(title='Minecraft Cape', color=EMBED_COLOR)
-            embed.set_author(name=user, icon_url=f'https://crafatar.com/avatars/{uuid}.png')
+            embed.set_author(name=user, icon_url=f'https://minotar.net/avatar/{uuid}.png')
             embed.set_image(url=skin['textures']['CAPE']['url'])
             embeds.append(embed)
 
         of = await self.bot.session.get(f'http://s.optifine.net/capes/{user}.png')
         if of.status == 200:
             embed = discord.Embed(title='Optifine Cape', color=EMBED_COLOR)
-            embed.set_author(name=user, icon_url=f'https://crafatar.com/avatars/{uuid}.png')
+            embed.set_author(name=user, icon_url=f'https://minotar.net/avatar/{uuid}.png')
             embed.set_image(url=f'http://s.optifine.net/capes/{user}.png')
             embeds.append(embed)
 
